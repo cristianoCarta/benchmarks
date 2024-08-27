@@ -1,0 +1,3 @@
+- Row wise - filtro per classe e stesse operazioni(quelle column wise) su image per quella data classe
+- Column/Row wise per operazioni su bounding box (conversione di formato)
+- Heat map di operazioni su immagini row o column wise variando N(dimensione del dataset o densità di immagini per sample) e dimensioni delle immagini
