@@ -1,6 +1,7 @@
 from .base import SampleGenerator
 import numpy as np
 import pyarrow as pa
+import pyarrow.parquet as pq
 import h5py
 
 class F1(SampleGenerator):
@@ -14,7 +15,7 @@ class F1(SampleGenerator):
                 image2 = np.random.rand(3,125,125)
                 image3 = np.random.rand(3,125,125)
                 shape = (3,125,125)
-            
+    
                 
                 bb1 = np.random.rand(4)
                 bb2 = np.random.rand(4)
@@ -23,6 +24,13 @@ class F1(SampleGenerator):
                 bb5 = np.random.rand(4)
                 image4 = np.random.rand(3,125,125)
                 label1 = np.random.randint(100,size=1)[0]
+
+                im1b = image1.tobytes()
+                im1b = image1.tobytes()
+                im1b = image1.tobytes()
+                im1b = image1.tobytes()
+
+                print(np.frombuffer(im1b.as_buffer(), dtype=np.float32).shape)
 
                 sample = {
                     "image_feature": [
@@ -142,5 +150,4 @@ class F1(SampleGenerator):
 
             table = pa.Table.from_pylist(output)
             df = table.to_pandas()
-            #df.to_csv(name+".csv")
             df.to_parquet(name+".parquet")
