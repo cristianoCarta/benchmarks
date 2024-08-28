@@ -1,3 +1,8 @@
 - Row wise - filtro per classe e stesse operazioni(quelle column wise) su image per quella data classe
 - Column/Row wise per operazioni su bounding box (conversione di formato)
 - Heat map di operazioni su immagini row o column wise variando N(dimensione del dataset o densità di immagini per sample) e dimensioni delle immagini
+
+
+NB : nei benchmark row-wise (pyarrow) si è fissato l'indice di riga delle immagini, nota bene, potrebbero essere più di un'immagine
+NB : anche per h5py va fatta un'altra iterazione nel benchmark row-wise nel caso il gruppo image_feature contenga più sottogruppi image (cercare soluzione oppure for con f{i} con i storato come attributo nel nodo image_feature)
+NB : gestione dei None per pyarrow
