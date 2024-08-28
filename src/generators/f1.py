@@ -30,7 +30,7 @@ class F1(SampleGenerator):
                 im1b = image1.tobytes()
                 im1b = image1.tobytes()
 
-                print(np.frombuffer(im1b.as_buffer(), dtype=np.float32).shape)
+                # print(np.frombuffer(im1b.as_buffer(), dtype=np.float32).shape)
 
                 sample = {
                     "image_feature": [
