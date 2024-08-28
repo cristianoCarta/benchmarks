@@ -5,6 +5,10 @@ import pyarrow.parquet as pq
 import h5py
 import random
 
+# FORMATS
+# 0 = YOLO
+# 1 = XY
+
 # List of words to create phrases from
 nouns = ['cat', 'dog', 'tree', 'house', 'car', 'book', 'computer', 'phone', 'coffee', 'mountain']
 adjectives = ['happy', 'sad', 'big', 'small', 'red', 'blue', 'green', 'clever', 'brave', 'shy']
@@ -52,12 +56,14 @@ class F2(SampleGenerator):
                         ],
                         "bounding_box_feature":[{
                             "bbox" : bb1,
+                            "format" : 0,
                             "text_feature":[{
                                 "description" : text
                             }]
                         },
                         {
                             "bbox" : bb2,
+                            "format" : 1,
                             "class_feature":[
                                 {
                                     "label" : bb_class
@@ -83,15 +89,17 @@ class F2(SampleGenerator):
                 class1.create_dataset("label",data=im_class)
 
                 boundingbox_feature1 = image.create_group('boundingbox_feature')
-                bb1 = boundingbox_feature1.create_group('bb1')
-                bb2 = boundingbox_feature1.create_group('bb2')
-                bb1.create_dataset('bbox', data=bb1)  
-                bb2.create_dataset('bbox', data=bb2)
+                bb1_g = boundingbox_feature1.create_group('bb1')
+                bb2_g = boundingbox_feature1.create_group('bb2')
+                bb1_g.create_dataset('bbox', data=bb1)  
+                bb2_g.create_dataset('bbox', data=bb2)
+                bb1_g.create_dataset('format', data=0)  
+                bb2_g.create_dataset('format', data=1)
 
-                text_feature = bb1.create_group("text_feature")
+                text_feature = bb1_g.create_group("text_feature")
                 text_feature.create_dataset("description",data=text)
 
-                class_feature2 = bb2.create_group("class_feature")
+                class_feature2 = bb2_g.create_group("class_feature")
                 class_feature2.create_dataset("label",data=bb_class)
         
         table = pa.Table.from_pylist(output)
