@@ -37,8 +37,9 @@ class F3(SampleGenerator):
                     struct_array.append(temp_dict)
 
                     #hdf5
-                    image_ds = image_feature.create_dataset('image', data=images[j])  
+                    image_ds = image_feature.create_dataset(f'image_{j}', data=images[j])  
                     image_ds.attrs["label"] = label
+                    image_ds.attrs["type"] = "image"
 
                 sample = {
                     "image_feature":struct_array
