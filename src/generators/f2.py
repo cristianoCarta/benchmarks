@@ -91,10 +91,12 @@ class F2(SampleGenerator):
                 boundingbox_feature1 = image.create_group('boundingbox_feature')
                 bb1_g = boundingbox_feature1.create_group('bb1')
                 bb2_g = boundingbox_feature1.create_group('bb2')
-                bb1_g.create_dataset('bbox', data=bb1)  
-                bb2_g.create_dataset('bbox', data=bb2)
-                bb1_g.create_dataset('format', data=0)  
-                bb2_g.create_dataset('format', data=1)
+                bb1_d = bb1_g.create_dataset('bbox', data=bb1)  
+                bb1_d.attrs["format"] = 0
+                bb2_d = bb2_g.create_dataset('bbox', data=bb2)
+                bb2_d.attrs["format"] = 1
+                #bb1_g.create_dataset('format', data=0)  
+                #bb2_g.create_dataset('format', data=1)
 
                 text_feature = bb1_g.create_group("text_feature")
                 text_feature.create_dataset("description",data=text)
