@@ -1,13 +1,17 @@
+##################                 DONE            ########################################
+
 - Row wise - filtro per classe e stesse operazioni(quelle column wise) su image per quella data classe
 - Column/Row wise per operazioni su bounding box (conversione di formato)
-
 - Heat map di operazioni su immagini row o column wise variando N(dimensione del dataset o densità di immagini per sample) e dimensioni delle immagini
-- Capire come vengono storate le info dal dataset di hugging face (file .arrow) e se stora le immagini in file di byte anche lui
 - Rifare i benchmark f1 e f2 (colonnari) con più dataset per gruppo e non con più gruppi con un solo dataset dallo stesso nome
 - Rifare i benchmark f1 e f2 con utilizzo dell'attribute types per accedere ai nodi desiderati
 
+
+##################                 UNDONE          ########################################
+- Capire come vengono storate le info dal dataset di hugging face (file .arrow) e se stora le immagini in file di byte anche lui
+- f4 : nuovo benchmark con altri parametri fissati e studio al variare di D (densità di buonding box)
+- f4 : nuovo benchmark con numero di bounding boxes per example estratto casualmente ( e per immagini)
+
 NB : nei benchmark row-wise (pyarrow) si è fissato l'indice di riga delle immagini, nota bene, potrebbero essere più di un'immagine
-NB : anche per h5py va fatta un'altra iterazione nel benchmark row-wise nel caso il gruppo image_feature contenga più sottogruppi image (cercare soluzione oppure for con f{i} con i storato come attributo nel nodo image_feature)
-NB : altra cosa, nel benchmark f2 bounding box di hd5f non riusciamo ad iterare sulle varie bbox senza essere specifici su quale bounding box vogliamo operare (se faccio endswith "bbox" potrei prendere anche bounding box del sample che non mi interessano) 
 NB : gestione dei None per pyarrow
 NB : per le BOUNDING BOX: mettere direttamente il formato (YOLO = 0 ad esempio) come quinto elemento della bouding box? Aumenterebbe l'efficienza sia di HDF5 che di Pyarrow
