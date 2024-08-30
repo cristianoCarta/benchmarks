@@ -7,3 +7,6 @@ class SampleGenerator(ABC):
                        N : int,
                        name : str = None):
         raise NotImplementedError("implement me")
+    
+    def benchmark(self):
+        raise NotImplementedError("implement me")
