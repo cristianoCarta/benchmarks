@@ -221,7 +221,7 @@ class F2(SampleGenerator):
 
             # Show the plot
             plt.savefig(f'{path}_{hdf5_driver}_load.pdf')  # Save as PDF
-            plt.show()
+            #plt.show()
 
             plt.title("HDF5 vs Arrow Manipulating")
             plt.plot(N, t_manipulate_hdf5, label="hdf5", color='blue')
@@ -238,7 +238,7 @@ class F2(SampleGenerator):
 
             # Show the plot
             plt.savefig(f'{path}_{hdf5_driver}_manipulate.pdf')  # Save as PDF
-            plt.show()
+            #plt.show()
 
         if save:
             np.save(f"{path}_t_load_arrow.npy",t_load_arrow)

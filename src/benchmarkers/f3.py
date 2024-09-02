@@ -186,7 +186,7 @@ class F3(SampleGenerator):
 
             # Show the plot
             plt.savefig(f'{path}_{hdf5_driver}_{D}_loading.pdf')  # Save as PDF
-            plt.show()
+            #plt.show()
 
 ##################################################################################################
 ##################################################################################################
@@ -233,7 +233,7 @@ class F3(SampleGenerator):
 
             # Show the plot
             plt.savefig(f'{path}_{hdf5_driver}_{D}_manipulating.pdf')  # Save as PDF
-            plt.show()
+            #plt.show()
 
 
         if save:

@@ -11,6 +11,7 @@
 - Capire come vengono storate le info dal dataset di hugging face (file .arrow) e se stora le immagini in file di byte anche lui
 - f4 : nuovo benchmark con altri parametri fissati e studio al variare di D (densità di buonding box)
 - f4 : nuovo benchmark con numero di bounding boxes per example estratto casualmente ( e per immagini)
+- f5 : nuovi benchmark con file .arrow e hdf5 con ipotesi di struttura dei sample uguale (con lo scopo di chiamare meno volte visititems)
 
 NB : nei benchmark row-wise (pyarrow) si è fissato l'indice di riga delle immagini, nota bene, potrebbero essere più di un'immagine
 NB : gestione dei None per pyarrow
