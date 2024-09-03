@@ -54,8 +54,11 @@ class F3(SampleGenerator):
                 output.append(sample)
         
         table = pa.Table.from_pylist(output)
-        df = table.to_pandas()
-        df.to_parquet(name+".parquet")
+        #df = table.to_pandas()
+        df = pq.write_table(table, name+".parquet")
+        del output 
+        del table
+        #df.to_parquet(name+".parquet")
 
     def benchmark_heatmap_column_wise(self,
                   path : str, 
