@@ -42,8 +42,10 @@ class ClockColumnWise:
 
             t_load_arrow.append(sum(tmp_load_arrow) / len(tmp_load_arrow))
             t_manipulate_arrow.append(sum(tmp_manipulate_arrow) / len(tmp_manipulate_arrow))
+
         self.t_load = t_load_arrow
         self.t_manipulate = t_manipulate_arrow
+        return self
 
     def benchmark_hdf5(self,
                   path : str, 
@@ -88,6 +90,7 @@ class ClockColumnWise:
 
         self.t_load = t_load_hdf5
         self.t_manipulate = t_manipulate_hdf5
+        return self
 
     def benchmark_arrow(
             self,
@@ -107,10 +110,10 @@ class ClockColumnWise:
             
             for j in tqdm(range(iterations)):
 
-
+                
                 if stream and memory:
                     st_time_load = time.time()
-                    with pa.memory_map(f'{path}.arrow', 'rb') as source:
+                    with pa.memory_map(f'{path}_{item}_stream.arrows', 'rb') as source:
                         table = pa.ipc.open_stream(source).read_all()
                         en_time_load = time.time()
                         tmp_load.append(en_time_load - st_time_load)
@@ -125,12 +128,12 @@ class ClockColumnWise:
                     end_time = time.time()
                     tmp_manipulate.append(end_time-start_time)
 
-                    t_load.append(sum(tmp_load) / len(tmp_load))
-                    t_manipulate.append(sum(tmp_manipulate) / len(tmp_manipulate))
+                    #t_load.append(sum(tmp_load) / len(tmp_load))
+                    #_manipulate.append(sum(tmp_manipulate) / len(tmp_manipulate))
                 
-                if stream and not memory:
+                elif stream and (not memory):
                     st_time_load = time.time()
-                    with pa.OSFile(f'{path}.arrow', 'rb') as source:
+                    with pa.OSFile(f'{path}_{item}_stream.arrows', 'rb') as source:
                         table = pa.ipc.open_stream(source).read_all()
                         en_time_load = time.time()
                         tmp_load.append(en_time_load - st_time_load)
@@ -145,12 +148,12 @@ class ClockColumnWise:
                     end_time = time.time()
                     tmp_manipulate.append(end_time-start_time)
 
-                    t_load.append(sum(tmp_load) / len(tmp_load))
-                    t_manipulate.append(sum(tmp_manipulate) / len(tmp_manipulate))
+                    #t_load.append(sum(tmp_load) / len(tmp_load))
+                    #t_manipulate.append(sum(tmp_manipulate) / len(tmp_manipulate))
 
-                if not stream and memory:
+                elif (not stream) and memory:
                     st_time_load = time.time()
-                    with pa.memory_map(f'{path}.arrow', 'rb') as source:
+                    with pa.memory_map(f'{path}_{item}_file.arrow', 'rb') as source:
                         table = pa.ipc.open_file(source).read_all()
                         en_time_load = time.time()
                         tmp_load.append(en_time_load - st_time_load)
@@ -165,12 +168,12 @@ class ClockColumnWise:
                     end_time = time.time()
                     tmp_manipulate.append(end_time-start_time)
 
-                    t_load.append(sum(tmp_load) / len(tmp_load))
-                    t_manipulate.append(sum(tmp_manipulate) / len(tmp_manipulate))
+                    #t_load.append(sum(tmp_load) / len(tmp_load))
+                    #t_manipulate.append(sum(tmp_manipulate) / len(tmp_manipulate))
 
-                if not stream and not memory:
+                elif (not stream) and (not memory):
                     st_time_load = time.time()
-                    with pa.OSFile(f'{path}.arrow', 'rb') as source:
+                    with pa.OSFile(f'{path}_{item}_file.arrow', 'rb') as source:
                         table = pa.ipc.open_file(source).read_all()
                         en_time_load = time.time()
                         tmp_load.append(en_time_load - st_time_load)
@@ -185,14 +188,18 @@ class ClockColumnWise:
                     end_time = time.time()
                     tmp_manipulate.append(end_time-start_time)
 
-                    t_load.append(sum(tmp_load) / len(tmp_load))
-                    t_manipulate.append(sum(tmp_manipulate) / len(tmp_manipulate))
+                    #t_load.append(sum(tmp_load) / len(tmp_load))
+                    #t_manipulate.append(sum(tmp_manipulate) / len(tmp_manipulate))
 
                 else:
                     raise NotImplementedError("something went wrong")
+        
+            t_load.append(sum(tmp_load) / len(tmp_load))
+            t_manipulate.append(sum(tmp_manipulate) / len(tmp_manipulate))
 
-            self.t_load = t_load
-            self.t_manipulate = t_manipulate
+        self.t_load = t_load
+        self.t_manipulate = t_manipulate
+        return self
 
 
 
