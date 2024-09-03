@@ -12,6 +12,7 @@ class ClockColumnWise:
                   path : str, 
                   N : List[int],
                   iterations : int,
+                  dim : int
                  ):
          
         t_load_arrow = []
@@ -32,7 +33,7 @@ class ClockColumnWise:
                 ### MANIPULATION ###
                 start_time_arrow = time.time()
                 oggetti = np.array(table.column("image_feature").chunk(0).values.field("boundingbox_feature").values.field("image_1_feature").values.field("image").to_pylist())
-                image_numpy = np.frombuffer(oggetti, dtype=np.float64).reshape(-1, 3, 125, 125)
+                image_numpy = np.frombuffer(oggetti, dtype=np.float64).reshape(-1, 3, dim, dim)
                 new_obj = np.transpose(image_numpy,axes=(0,3,2,1))   
                 new_obj = np.square(new_obj)
                 new_obj = np.exp(new_obj)
@@ -97,6 +98,7 @@ class ClockColumnWise:
             path : str, 
             N : List[int],
             iterations : int,
+            dim : int,
             memory : bool = False,
             stream : bool = False):
         
@@ -120,7 +122,7 @@ class ClockColumnWise:
 
                     start_time = time.time()
                     oggetti = np.array(table.column("image_feature").chunk(0).values.field("boundingbox_feature").values.field("image_1_feature").values.field("image").to_pylist())
-                    image_numpy = np.frombuffer(oggetti, dtype=np.float64).reshape(-1, 3, 125, 125)
+                    image_numpy = np.frombuffer(oggetti, dtype=np.float64).reshape(-1, 3, dim, dim)
                     new_obj = np.transpose(image_numpy,axes=(0,3,2,1))   
                     new_obj = np.square(new_obj)
                     new_obj = np.exp(new_obj)
@@ -140,7 +142,7 @@ class ClockColumnWise:
 
                     start_time = time.time()
                     oggetti = np.array(table.column("image_feature").chunk(0).values.field("boundingbox_feature").values.field("image_1_feature").values.field("image").to_pylist())
-                    image_numpy = np.frombuffer(oggetti, dtype=np.float64).reshape(-1, 3, 125, 125)
+                    image_numpy = np.frombuffer(oggetti, dtype=np.float64).reshape(-1, 3, dim, dim)
                     new_obj = np.transpose(image_numpy,axes=(0,3,2,1))   
                     new_obj = np.square(new_obj)
                     new_obj = np.exp(new_obj)
@@ -160,7 +162,7 @@ class ClockColumnWise:
 
                     start_time = time.time()
                     oggetti = np.array(table.column("image_feature").chunk(0).values.field("boundingbox_feature").values.field("image_1_feature").values.field("image").to_pylist())
-                    image_numpy = np.frombuffer(oggetti, dtype=np.float64).reshape(-1, 3, 125, 125)
+                    image_numpy = np.frombuffer(oggetti, dtype=np.float64).reshape(-1, 3, dim, dim)
                     new_obj = np.transpose(image_numpy,axes=(0,3,2,1))   
                     new_obj = np.square(new_obj)
                     new_obj = np.exp(new_obj)
@@ -180,7 +182,7 @@ class ClockColumnWise:
 
                     start_time = time.time()
                     oggetti = np.array(table.column("image_feature").chunk(0).values.field("boundingbox_feature").values.field("image_1_feature").values.field("image").to_pylist())
-                    image_numpy = np.frombuffer(oggetti, dtype=np.float64).reshape(-1, 3, 125, 125)
+                    image_numpy = np.frombuffer(oggetti, dtype=np.float64).reshape(-1, 3, dim, dim)
                     new_obj = np.transpose(image_numpy,axes=(0,3,2,1))   
                     new_obj = np.square(new_obj)
                     new_obj = np.exp(new_obj)

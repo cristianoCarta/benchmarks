@@ -12,15 +12,15 @@ class Generator:
     
 
 
-    def create_dataset(self, N: int, name : str):
+    def create_dataset(self, N: int, name : str, dim : int):
             output = []
             for i in range(N):
                 text1 = "Foto di una nebulosa"
                 text2 = "Foto infrarossi di una nebulosa"
-                image1 = np.random.rand(3,125,125)
-                image2 = np.random.rand(3,125,125)
-                image3 = np.random.rand(3,125,125)
-                shape = (3,125,125)
+                image1 = np.random.rand(3,dim,dim)
+                image2 = np.random.rand(3,dim,dim)
+                image3 = np.random.rand(3,dim,dim)
+                shape = (3,dim,dim)
     
                 
                 bb1 = np.random.rand(4)
@@ -28,7 +28,7 @@ class Generator:
                 bb3 = np.random.rand(4)
                 bb4 = np.random.rand(4)
                 bb5 = np.random.rand(4)
-                image4 = np.random.rand(3,125,125)
+                image4 = np.random.rand(3,dim,dim)
                 label1 = np.random.randint(100,size=1)[0]
 
                 im1b = image1.tobytes()
@@ -93,10 +93,10 @@ class Generator:
                 for i in range(N):
                     text1 = "Foto di una nebulosa"
                     text2 = "Foto infrarossi di una nebulosa"
-                    im1 = np.random.rand(3,125,125)
-                    im2 = np.random.rand(3,125,125)
-                    im3 = np.random.rand(3,125,125)
-                    shape = (3,125,125)
+                    im1 = np.random.rand(3,dim,dim)
+                    im2 = np.random.rand(3,dim,dim)
+                    im3 = np.random.rand(3,dim,dim)
+                    shape = (3,dim,dim)
                 
                     
                     bb1 = np.random.rand(4)
@@ -104,7 +104,7 @@ class Generator:
                     bb3 = np.random.rand(4)
                     bb4 = np.random.rand(4)
                     bb5 = np.random.rand(4)
-                    im4 = np.random.rand(3,125,125)
+                    im4 = np.random.rand(3,dim,dim)
                     label1 = np.random.randint(100,size=1)[0]
                     example = f.create_group(f'example_{i}')
                     image_feature = example.create_group('image_feature')
