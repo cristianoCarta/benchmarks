@@ -8,7 +8,7 @@ import time
 from matplotlib import pyplot as plt
 from typing import List
 
-class F1(SampleGenerator):
+class F7(SampleGenerator):
 
     def create_dataset(self, N: int, name : str , hdf5_driver : str):
             output = []
@@ -152,11 +152,10 @@ class F1(SampleGenerator):
                     text_feature = example.create_group('text_feature')
                     text_feature.create_dataset('text', data=text1)
 
+
             table = pa.Table.from_pylist(output)
-            df = pq.write_table(table, name+".parquet")
-            del output 
-            del table
-            #df.to_parquet(name+".parquet")
+            df = table.to_pandas()
+            df.to_parquet(name+".parquet")
 
 
     def benchmark(self,
@@ -207,19 +206,31 @@ class F1(SampleGenerator):
                     tmp_load_hdf5.append(en_time_hdf5 - st_time_hdf5)
                     
                     ### MANIPULATION ###
-                    def get_all_image_datasets():
-                        image_datasets = []                
-                        def visit_func(name, obj):
-                            if isinstance(obj, h5py.Dataset) and ("type" in obj.attrs) and obj.attrs["type"] == "leaf_image":
-                                new_obj = np.transpose(obj)   
-                                new_obj = np.square(new_obj)
-                                new_obj = np.exp(new_obj)
-                                new_obj = np.transpose(new_obj)
-                                image_datasets.append(new_obj[:])
-                        f.visititems(visit_func)
-                        return np.array(image_datasets)
+                    #def get_all_image_datasets():
+                    #    image_datasets = []                
+                    #    def visit_func(name, obj):
+                    #        if isinstance(obj, h5py.Dataset) and ("type" in obj.attrs) and obj.attrs["type"] == "leaf_image":
+                    #            new_obj = np.transpose(obj)   
+                    #            new_obj = np.square(new_obj)
+                    #            new_obj = np.exp(new_obj)
+                    #            new_obj = np.transpose(new_obj)
+                    #            image_datasets.append(new_obj[:])
+                    #    f.visititems(visit_func)
+                    #    return np.array(image_datasets)
+                    #start_time_hdf5 = time.time()
+                    #image_ds = get_all_image_datasets()
+                    #end_time_hdf5 = time.time()
+                    image_datasets = []
                     start_time_hdf5 = time.time()
-                    image_ds = get_all_image_datasets()
+                    for i in range(item):
+                        dataset = f.get(f"example_{i}/image_feature/image1/boundingbox_feature/bb1/image_1_feature/image")
+                        if dataset:
+                            obj = dataset[:]
+                            new_obj = np.transpose(obj)   
+                            new_obj = np.square(new_obj)
+                            new_obj = np.exp(new_obj)
+                            new_obj = np.transpose(new_obj)
+                            image_datasets.append(new_obj[:])
                     end_time_hdf5 = time.time()
                     tmp_manipulate_hdf5.append(end_time_hdf5-start_time_hdf5)
 
@@ -249,7 +260,7 @@ class F1(SampleGenerator):
 
             plt.clf() 
 
-            plt.title("HDF5 vs Arrow Manipulating")
+            plt.title("HDF5 vs Arrow Manipulating (no visititems)")
             plt.plot(N, t_manipulate_hdf5, label="hdf5", color='blue')
 
             # Create the second plot

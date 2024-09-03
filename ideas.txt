@@ -11,10 +11,23 @@
 
 - f4 : nuovo benchmark con altri parametri fissati e studio al variare di D (densità di buonding box)
 - f5 : nuovo benchmark con numero di bounding boxes per example estratto casualmente ( e per immagini)
-
 - f6 : nuovi benchmark con file .arrow:
     - a: stream con/senza memory mapping
     - b: file con/senza memory mapping
+
+##################     v2    ##########################
+Una nuova cartella benchmarksV2 dove teniamo fissa l'alberatura, variamo N (e non la densità D) e benchmarkiamo
+    .arrow file (memory mapping e non) 
+    .arrow stream (memory mapping e non) 
+    parquet 
+    HDF5 (core e sec2 senza visititems)
+
+Tutto ciò va fatto column-wise e row-wise con operazioni su immagini di diverse dimensioni. La numeriosità del dataset la prendiamo sempre
+in esame in quanto scorriamo sempre lungo N
+
+Cambiare la decodifica delle immagini passando per PIL e torchvision.transform
+
+
 
 alternativa a visititems : get
 

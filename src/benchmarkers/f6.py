@@ -8,7 +8,7 @@ import time
 from matplotlib import pyplot as plt
 from typing import List
 
-class F1(SampleGenerator):
+class F6(SampleGenerator):
 
     def create_dataset(self, N: int, name : str , hdf5_driver : str):
             output = []
@@ -153,124 +153,8 @@ class F1(SampleGenerator):
                     text_feature.create_dataset('text', data=text1)
 
             table = pa.Table.from_pylist(output)
-            df = pq.write_table(table, name+".parquet")
-            del output 
-            del table
-            #df.to_parquet(name+".parquet")
-
-
-    def benchmark(self,
-                  path : str, 
-                  N : List[int],
-                  iterations : int,
-                  hdf5_driver : str = None,
-                  plot : bool = False,
-                  save : bool = False):
-         
-        t_load_hdf5 = []
-        t_manipulate_hdf5 = []
-
-        t_load_arrow = []
-        t_manipulate_arrow = []
-
-        for item in N:
-
-            tmp_load_hdf5 = []
-            tmp_manipulate_hdf5 = []
-
-            tmp_load_arrow = []
-            tmp_manipulate_arrow = []
-
-            
-            for j in tqdm(range(iterations)):
-                ### LOADING ###
-                st_time_arrow = time.time()
-                table = pq.read_table(f'{path}_{item}.parquet')
-                en_time_arrow = time.time()
-                tmp_load_arrow.append(en_time_arrow - st_time_arrow)
-
-                ### MANIPULATION ###
-                start_time_arrow = time.time()
-                oggetti = np.array(table.column("image_feature").chunk(0).values.field("boundingbox_feature").values.field("image_1_feature").values.field("image").to_pylist())
-                image_numpy = np.frombuffer(oggetti, dtype=np.float64).reshape(-1, 3, 125, 125)
-                new_obj = np.transpose(image_numpy,axes=(0,3,2,1))   
-                new_obj = np.square(new_obj)
-                new_obj = np.exp(new_obj)
-                new_obj = np.transpose(new_obj,axes=(0,3,2,1))
-                end_time_arrow = time.time()
-                tmp_manipulate_arrow.append(end_time_arrow-start_time_arrow)
-
-                ### LOADING ###
-                st_time_hdf5 = time.time()
-                with h5py.File(f'{path}_{item}_{hdf5_driver}.h5', 'r', driver=hdf5_driver) as f:
-                    en_time_hdf5 = time.time()
-                    tmp_load_hdf5.append(en_time_hdf5 - st_time_hdf5)
-                    
-                    ### MANIPULATION ###
-                    def get_all_image_datasets():
-                        image_datasets = []                
-                        def visit_func(name, obj):
-                            if isinstance(obj, h5py.Dataset) and ("type" in obj.attrs) and obj.attrs["type"] == "leaf_image":
-                                new_obj = np.transpose(obj)   
-                                new_obj = np.square(new_obj)
-                                new_obj = np.exp(new_obj)
-                                new_obj = np.transpose(new_obj)
-                                image_datasets.append(new_obj[:])
-                        f.visititems(visit_func)
-                        return np.array(image_datasets)
-                    start_time_hdf5 = time.time()
-                    image_ds = get_all_image_datasets()
-                    end_time_hdf5 = time.time()
-                    tmp_manipulate_hdf5.append(end_time_hdf5-start_time_hdf5)
-
-            t_load_arrow.append(sum(tmp_load_arrow) / len(tmp_load_arrow))
-            t_manipulate_arrow.append(sum(tmp_manipulate_arrow) / len(tmp_manipulate_arrow))
-
-            t_load_hdf5.append(sum(tmp_load_hdf5) / len(tmp_load_hdf5))
-            t_manipulate_hdf5.append(sum(tmp_manipulate_hdf5) / len(tmp_manipulate_hdf5))
-
-        if plot:
-            plt.title("HDF5 vs Arrow Loading")
-            plt.plot(N, t_load_hdf5, label="hdf5", color='blue')
-
-            # Create the second plot
-            plt.plot(N, t_load_arrow, label="arrow", color='red')
-
-            # Add a legend
-            plt.legend()
-
-            # Add titles and labels
-            plt.xlabel("N (number of samples)")
-            plt.ylabel("t (seconds)")
-
-            # Show the plot
-            plt.savefig(f'{path}_{hdf5_driver}_load.pdf')  # Save as PDF
-            #plt.show()
-
-            plt.clf() 
-
-            plt.title("HDF5 vs Arrow Manipulating")
-            plt.plot(N, t_manipulate_hdf5, label="hdf5", color='blue')
-
-            # Create the second plot
-            plt.plot(N, t_manipulate_arrow, label="arrow", color='red')
-
-            # Add a legend
-            plt.legend()
-
-            # Add titles and labels
-            plt.xlabel("N (number of samples)")
-            plt.ylabel("t (seconds)")
-
-            # Show the plot
-            plt.savefig(f'{path}_{hdf5_driver}_manipulate.pdf')  # Save as PDF
-            #plt.show()
-
-        if save:
-            np.save(f"{path}_t_load_arrow.npy",t_load_arrow)
-            np.save(f"{path}_t_manipulate_arrow.npy",t_manipulate_arrow)
-            np.save(f"{path}_t_load_hdf5_{hdf5_driver}.npy",t_load_hdf5)
-            np.save(f"{path}_t_manipulate_hdf5_{hdf5_driver}.npy",t_manipulate_hdf5)
-            
-        return t_load_arrow, t_manipulate_arrow , t_load_hdf5 , t_manipulate_hdf5
-
+            batches = table.to_batches()
+            with pa.OSFile(name+".arrow", 'wb') as sink:
+                with pa.ipc.new_stream(sink, batches[0].schema) as writer:
+                    for batch in batches:
+                            writer.write(batch)
