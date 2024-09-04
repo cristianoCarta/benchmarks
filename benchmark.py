@@ -4,92 +4,262 @@ import pyarrow.parquet as pq
 import pyarrow.compute as pc
 import h5py
 from src.benchmarkers import *
+from src.benchmarkersV2 import *
 import time
+from tqdm import tqdm
 from matplotlib import pyplot as plt
 np.random.seed(0)
 
-#N = [10,100,200,300,500]
-N=[500]
-d = [(3, 32, 32), (3, 64, 64), (3, 96, 96), (3, 128, 128), (3, 192, 192), 
- (3, 256, 256), (3, 384, 384), (3, 512, 512)]
-D = 5
+
+N = [10,100,200,300,500]
+dimensions = [32,64,125,192]
+selected_label = 10
 iterations = 100
-selected_label = 6
 
-#benchmark = F1()
-#
-#for item in N:
-#    benchmark.create_dataset(item,f"outputs/f1/core/f1_{item}","core")
-#for item in N:
-#    benchmark.create_dataset(item,f"outputs/f1/sec2/f1_{item}","sec2")
-#
-#t1,t2,t3,t4 = benchmark.benchmark("outputs/f1/core/f1",N,iterations,hdf5_driver="core",plot=True,save=True)
-#t1,t2,t3,t4 = benchmark.benchmark("outputs/f1/sec2/f1",N,iterations,hdf5_driver="sec2",plot=True,save=True)
-#
-#benchmark = F2()
-#
-#for item in N:
-#    benchmark.create_dataset(item,f"outputs/f2/row_wise/core/f2_{item}","core")
-#for item in N:
-#    benchmark.create_dataset(item,f"outputs/f2/row_wise/sec2/f2_{item}","sec2")
-#
-#t1,t2,t3,t4 = benchmark.benchmark_row_wise("outputs/f2/row_wise/core/f2",N,iterations,selected_label,hdf5_driver="core",plot=True,save=True)
-#t1,t2,t3,t4 = benchmark.benchmark_row_wise("outputs/f2/row_wise/sec2/f2",N,iterations,selected_label,hdf5_driver="sec2",plot=True,save=True)
-#
-#for item in N:
-#    benchmark.create_dataset(item,f"outputs/f2/bounding_boxes/core/f2_{item}","core")
-#for item in N:
-#    benchmark.create_dataset(item,f"outputs/f2/bounding_boxes/sec2/f2_{item}","sec2")
-#
-#t1,t2,t3,t4 = benchmark.benchmark_bounding_boxes_conversion("outputs/f2/bounding_boxes/core/f2",N,iterations,selected_label,hdf5_driver="core",plot=True,save=True)
-#t1,t2,t3,t4 = benchmark.benchmark_bounding_boxes_conversion("outputs/f2/bounding_boxes/sec2/f2",N,iterations,selected_label,hdf5_driver="sec2",plot=True,save=True)
+generator = Generator()
 
-benchmark = F3()
+for dim in dimensions:
 
-for item in N:
-    for res in tqdm(d):
-        benchmark.create_dataset(item,res,D,f"outputs/f3/column_wise/core/f3_{item}_{res}_{D}","core")
-for item in N:
-    for res in tqdm(d):
-        benchmark.create_dataset(item,res,D,f"outputs/f3/column_wise/sec2/f3_{item}_{res}_{D}","sec2")
+    ########## ROW - WISE ###############
 
-t1,t2,t3,t4 = benchmark.benchmark_heatmap_column_wise("outputs/f3/column_wise/core/f3",N,d,D,iterations,hdf5_driver="core",plot=True,save=True)
-t1,t2,t3,t4 = benchmark.benchmark_heatmap_column_wise("outputs/f3/column_wise/sec2/f3",N,d,D,iterations,hdf5_driver="sec2",plot=True,save=True)
+    arrow_file_memory = ClockRowWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,selected_label,memory=True,stream=False)
+    arrow_stream_memory = ClockRowWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,selected_label,memory=True,stream=True)
+    arrow_file_no_memory = ClockRowWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,selected_label,memory=False,stream=False)
+    arrow_stream_no_memory = ClockRowWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,selected_label,memory=False,stream=True)
+    arrow_parquet = ClockRowWise().benchmark_parquet(f"outputs/v2/{dim}/ds",N,iterations,selected_label,dim)
+    hdf5_core = ClockRowWise().benchmark_hdf5(f"outputs/v2/{dim}/ds",N,iterations,selected_label,hdf5_driver="core")
+    hdf5_sec2 = ClockRowWise().benchmark_hdf5(f"outputs/v2/{dim}/ds",N,iterations,selected_label,hdf5_driver="sec2")
 
-selected_label = 1
+    t_load_arrow_file_memory = arrow_file_memory.t_load
+    t_load_arrow_stream_memory = arrow_stream_memory.t_load
+    t_load_arrow_file_no_memory = arrow_file_no_memory.t_load
+    t_load_arrow_stream_no_memory = arrow_stream_no_memory.t_load
+    t_load_arrow_parquet = arrow_parquet.t_load
+    t_load_hdf5_core = hdf5_core.t_load
+    t_load_hdf5_sec2 = hdf5_sec2.t_load
 
-for item in N:
-    for res in tqdm(d):
-        benchmark.create_dataset(item,res,D,f"outputs/f3/row_wise/core/f3_{item}_{res}_{D}","core")
-for item in N:
-    for res in tqdm(d):
-        benchmark.create_dataset(item,res,D,f"outputs/f3/row_wise/sec2/f3_{item}_{res}_{D}","sec2")
+    t_access_arrow_file_memory = arrow_file_memory.t_access
+    t_access_arrow_stream_memory = arrow_stream_memory.t_access
+    t_access_arrow_file_no_memory = arrow_file_no_memory.t_access
+    t_access_arrow_stream_no_memory = arrow_stream_no_memory.t_access
+    t_access_arrow_parquet = arrow_parquet.t_access
+    t_access_hdf5_core = hdf5_core.t_access
+    t_access_hdf5_sec2 = hdf5_sec2.t_access
 
-t1,t2,t3,t4 = benchmark.benchmark_heatmap_row_wise("outputs/f3/row_wise/core/f3",N,d,D,iterations,selected_label,hdf5_driver="core",plot=True,save=True)
-t1,t2,t3,t4 = benchmark.benchmark_heatmap_row_wise("outputs/f3/row_wise/sec2/f3",N,d,D,iterations,selected_label,hdf5_driver="sec2",plot=True,save=True)
+    t_manipulate_arrow_file_memory = arrow_file_memory.t_manipulate
+    t_manipulate_arrow_stream_memory = arrow_stream_memory.t_manipulate
+    t_manipulate_arrow_file_no_memory = arrow_file_no_memory.t_manipulate
+    t_manipulate_arrow_stream_no_memory = arrow_stream_no_memory.t_manipulate
+    t_manipulate_arrow_parquet = arrow_parquet.t_manipulate
+    t_manipulate_hdf5_core = hdf5_core.t_manipulate
+    t_manipulate_hdf5_sec2 = hdf5_sec2.t_manipulate
+
+    np.save(f"results/v2/row_wise/{dim}/t_load_arrow_file_memory.npy",t_load_arrow_file_memory)
+    np.save(f"results/v2/row_wise/{dim}/t_load_arrow_stream_memory.npy",t_load_arrow_stream_memory)
+    np.save(f"results/v2/row_wise/{dim}/t_load_arrow_file_no_memory.npy",t_load_arrow_file_no_memory)
+    np.save(f"results/v2/row_wise/{dim}/t_load_arrow_stream_no_memory.npy",t_load_arrow_stream_no_memory)
+    np.save(f"results/v2/row_wise/{dim}/t_load_arrow_parquet.npy",t_load_arrow_parquet)
+    np.save(f"results/v2/row_wise/{dim}/t_load_hdf5_core.npy",t_load_hdf5_core)
+    np.save(f"results/v2/row_wise/{dim}/t_load_hdf5_sec2.npy",t_load_hdf5_sec2)
+
+    np.save(f"results/v2/row_wise/{dim}/t_access_arrow_file_memory.npy",t_access_arrow_file_memory)
+    np.save(f"results/v2/row_wise/{dim}/t_access_arrow_stream_memory.npy",t_access_arrow_stream_memory)
+    np.save(f"results/v2/row_wise/{dim}/t_access_arrow_file_no_memory.npy",t_access_arrow_file_no_memory)
+    np.save(f"results/v2/row_wise/{dim}/t_access_arrow_stream_no_memory.npy",t_access_arrow_stream_no_memory)
+    np.save(f"results/v2/row_wise/{dim}/t_access_arrow_parquet.npy",t_access_arrow_parquet)
+    np.save(f"results/v2/row_wise/{dim}/t_access_hdf5_core.npy",t_access_hdf5_core)
+    np.save(f"results/v2/row_wise/{dim}/t_access_hdf5_sec2.npy",t_access_hdf5_sec2)
+
+    np.save(f"results/v2/row_wise/{dim}/t_manipulate_arrow_file_memory.npy",t_manipulate_arrow_file_memory)
+    np.save(f"results/v2/row_wise/{dim}/t_manipulate_arrow_stream_memory.npy",t_manipulate_arrow_stream_memory)
+    np.save(f"results/v2/row_wise/{dim}/t_manipulate_arrow_file_no_memory.npy",t_manipulate_arrow_file_no_memory)
+    np.save(f"results/v2/row_wise/{dim}/t_manipulate_arrow_stream_no_memory.npy",t_manipulate_arrow_stream_no_memory)
+    np.save(f"results/v2/row_wise/{dim}/t_manipulate_arrow_parquet.npy",t_manipulate_arrow_parquet)
+    np.save(f"results/v2/row_wise/{dim}/t_manipulate_hdf5_core.npy",t_manipulate_hdf5_core)
+    np.save(f"results/v2/row_wise/{dim}/t_manipulate_hdf5_sec2.npy",t_manipulate_hdf5_sec2)
+
+    plt.title("HDF5 vs Arrow Loading")
+    plt.plot(N, t_load_arrow_file_memory, label="arrow_file_memory_map")
+    plt.plot(N, t_load_arrow_stream_memory, label="arrow_stream_memory_map")
+    plt.plot(N, t_load_arrow_file_no_memory, label="arrow_file_no_memory_map")
+    plt.plot(N, t_load_arrow_stream_no_memory, label="arrow_stream_no_memory_map")
+    plt.plot(N, t_load_arrow_parquet, label="arrow_parquet")
+    plt.plot(N, t_load_hdf5_core, label="hdf5_core")
+    plt.plot(N, t_load_hdf5_sec2, label="hdf5_sec2")
+
+    # Add a legend
+    plt.legend()
+
+    # Add titles and labels
+    plt.xlabel("N (number of samples)")
+    plt.ylabel("t (seconds)")
+
+    # Show the plot
+    plt.savefig(f"results/v2/row_wise/{dim}/load_{dim}.pdf")  # Save as PDF
+
+    plt.clf()
+
+    plt.title("HDF5 vs Arrow Access")
+    plt.plot(N, t_access_arrow_file_memory, label="arrow_file_memory_map")
+    plt.plot(N, t_access_arrow_stream_memory, label="arrow_stream_memory_map")
+    plt.plot(N, t_access_arrow_file_no_memory, label="arrow_file_no_memory_map")
+    plt.plot(N, t_access_arrow_stream_no_memory, label="arrow_stream_no_memory_map")
+    plt.plot(N, t_access_arrow_parquet, label="arrow_parquet")
+    plt.plot(N, t_access_hdf5_core, label="hdf5_core")
+    plt.plot(N, t_access_hdf5_sec2, label="hdf5_sec2")
+
+    # Add a legend
+    plt.legend()
+
+    # Add titles and labels
+    plt.xlabel("N (number of samples)")
+    plt.ylabel("t (seconds)")
+
+    # Show the plot
+    plt.savefig(f"results/v2/row_wise/{dim}/access_{dim}.pdf")  # Save as PDF
+
+    plt.clf()
+
+    plt.title("HDF5 vs Arrow Manipulating")
+    plt.plot(N, t_manipulate_arrow_file_memory, label="arrow_file_memory_map")
+    plt.plot(N, t_manipulate_arrow_stream_memory, label="arrow_stream_memory_map")
+    plt.plot(N, t_manipulate_arrow_file_no_memory, label="arrow_file_no_memory_map")
+    plt.plot(N, t_manipulate_arrow_stream_no_memory, label="arrow_stream_no_memory_map")
+    plt.plot(N, t_manipulate_arrow_parquet, label="arrow_parquet")
+    plt.plot(N, t_manipulate_hdf5_core, label="hdf5_core")
+    plt.plot(N, t_manipulate_hdf5_sec2, label="hdf5_sec2")
+
+    # Add a legend
+    plt.legend()
+
+    # Add titles and labels
+    plt.xlabel("N (number of samples)")
+    plt.ylabel("t (seconds)")
+
+    # Show the plot
+    plt.savefig(f"results/v2/row_wise/{dim}/manipulating_{dim}.pdf")  # Save as PDF
+
+    plt.clf()
 
 
-#D = 10
-#
-#
-#for item in N:
-#    for res in tqdm(d):
-#        benchmark.create_dataset(item,res,D,f"outputs/f3/column_wise/core/f3_{item}_{res}_{D}","core")
-#for item in N:
-#    for res in tqdm(d):
-#        benchmark.create_dataset(item,res,D,f"outputs/f3/column_wise/sec2/f3_{item}_{res}_{D}","sec2")
-#
-#t1,t2,t3,t4 = benchmark.benchmark_heatmap_column_wise("outputs/f3/column_wise/core/f3",N,d,D,iterations,hdf5_driver="core",plot=True,save=True)
-#t1,t2,t3,t4 = benchmark.benchmark_heatmap_column_wise("outputs/f3/column_wise/sec2/f3",N,d,D,iterations,hdf5_driver="sec2",plot=True,save=True)
-#
-#selected_label = 1
-#
-#for item in N:
-#    for res in tqdm(d):
-#        benchmark.create_dataset(item,res,D,f"outputs/f3/row_wise/core/f3_{item}_{res}_{D}","core")
-#for item in N:
-#    for res in tqdm(d):
-#        benchmark.create_dataset(item,res,D,f"outputs/f3/row_wise/sec2/f3_{item}_{res}_{D}","sec2")
-#
-#t1,t2,t3,t4 = benchmark.benchmark_heatmap_row_wise("outputs/f3/row_wise/core/f3",N,d,D,iterations,selected_label,hdf5_driver="core",plot=True,save=True)
-#t1,t2,t3,t4 = benchmark.benchmark_heatmap_row_wise("outputs/f3/row_wise/sec2/f3",N,d,D,iterations,selected_label,hdf5_driver="sec2",plot=True,save=True)
+
+    ############### COLUMN - WISE #######################
+
+    arrow_file_memory = ClockColumnWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,memory=True,stream=False)
+    arrow_stream_memory = ClockColumnWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,memory=True,stream=True)
+    arrow_file_no_memory = ClockColumnWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,memory=False,stream=False)
+    arrow_stream_no_memory = ClockColumnWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,memory=False,stream=True)
+    arrow_parquet = ClockColumnWise().benchmark_parquet(f"outputs/v2/{dim}/ds",N,iterations,dim)
+    hdf5_core = ClockColumnWise().benchmark_hdf5(f"outputs/v2/{dim}/ds",N,iterations,hdf5_driver="core")
+    hdf5_sec2 = ClockColumnWise().benchmark_hdf5(f"outputs/v2/{dim}/ds",N,iterations,hdf5_driver="sec2")
+
+    t_load_arrow_file_memory = arrow_file_memory.t_load
+    t_load_arrow_stream_memory = arrow_stream_memory.t_load
+    t_load_arrow_file_no_memory = arrow_file_no_memory.t_load
+    t_load_arrow_stream_no_memory = arrow_stream_no_memory.t_load
+    t_load_arrow_parquet = arrow_parquet.t_load
+    t_load_hdf5_core = hdf5_core.t_load
+    t_load_hdf5_sec2 = hdf5_sec2.t_load
+
+    t_access_arrow_file_memory = arrow_file_memory.t_access
+    t_access_arrow_stream_memory = arrow_stream_memory.t_access
+    t_access_arrow_file_no_memory = arrow_file_no_memory.t_access
+    t_access_arrow_stream_no_memory = arrow_stream_no_memory.t_access
+    t_access_arrow_parquet = arrow_parquet.t_access
+    t_access_hdf5_core = hdf5_core.t_access
+    t_access_hdf5_sec2 = hdf5_sec2.t_access
+
+    t_manipulate_arrow_file_memory = arrow_file_memory.t_manipulate
+    t_manipulate_arrow_stream_memory = arrow_stream_memory.t_manipulate
+    t_manipulate_arrow_file_no_memory = arrow_file_no_memory.t_manipulate
+    t_manipulate_arrow_stream_no_memory = arrow_stream_no_memory.t_manipulate
+    t_manipulate_arrow_parquet = arrow_parquet.t_manipulate
+    t_manipulate_hdf5_core = hdf5_core.t_manipulate
+    t_manipulate_hdf5_sec2 = hdf5_sec2.t_manipulate
+
+    np.save(f"results/v2/column_wise/{dim}/t_load_arrow_file_memory.npy",t_load_arrow_file_memory)
+    np.save(f"results/v2/column_wise/{dim}/t_load_arrow_stream_memory.npy",t_load_arrow_stream_memory)
+    np.save(f"results/v2/column_wise/{dim}/t_load_arrow_file_no_memory.npy",t_load_arrow_file_no_memory)
+    np.save(f"results/v2/column_wise/{dim}/t_load_arrow_stream_no_memory.npy",t_load_arrow_stream_no_memory)
+    np.save(f"results/v2/column_wise/{dim}/t_load_arrow_parquet.npy",t_load_arrow_parquet)
+    np.save(f"results/v2/column_wise/{dim}/t_load_hdf5_core.npy",t_load_hdf5_core)
+    np.save(f"results/v2/column_wise/{dim}/t_load_hdf5_sec2.npy",t_load_hdf5_sec2)
+
+    np.save(f"results/v2/column_wise/{dim}/t_access_arrow_file_memory.npy",t_access_arrow_file_memory)
+    np.save(f"results/v2/column_wise/{dim}/t_access_arrow_stream_memory.npy",t_access_arrow_stream_memory)
+    np.save(f"results/v2/column_wise/{dim}/t_access_arrow_file_no_memory.npy",t_access_arrow_file_no_memory)
+    np.save(f"results/v2/column_wise/{dim}/t_access_arrow_stream_no_memory.npy",t_access_arrow_stream_no_memory)
+    np.save(f"results/v2/column_wise/{dim}/t_access_arrow_parquet.npy",t_access_arrow_parquet)
+    np.save(f"results/v2/column_wise/{dim}/t_access_hdf5_core.npy",t_access_hdf5_core)
+    np.save(f"results/v2/column_wise/{dim}/t_access_hdf5_sec2.npy",t_access_hdf5_sec2)
+
+    np.save(f"results/v2/column_wise/{dim}/t_manipulate_arrow_file_memory.npy",t_manipulate_arrow_file_memory)
+    np.save(f"results/v2/column_wise/{dim}/t_manipulate_arrow_stream_memory.npy",t_manipulate_arrow_stream_memory)
+    np.save(f"results/v2/column_wise/{dim}/t_manipulate_arrow_file_no_memory.npy",t_manipulate_arrow_file_no_memory)
+    np.save(f"results/v2/column_wise/{dim}/t_manipulate_arrow_stream_no_memory.npy",t_manipulate_arrow_stream_no_memory)
+    np.save(f"results/v2/column_wise/{dim}/t_manipulate_arrow_parquet.npy",t_manipulate_arrow_parquet)
+    np.save(f"results/v2/column_wise/{dim}/t_manipulate_hdf5_core.npy",t_manipulate_hdf5_core)
+    np.save(f"results/v2/column_wise/{dim}/t_manipulate_hdf5_sec2.npy",t_manipulate_hdf5_sec2)
+
+    plt.title("HDF5 vs Arrow Loading")
+    plt.plot(N, t_load_arrow_file_memory, label="arrow_file_memory_map")
+    plt.plot(N, t_load_arrow_stream_memory, label="arrow_stream_memory_map")
+    plt.plot(N, t_load_arrow_file_no_memory, label="arrow_file_no_memory_map")
+    plt.plot(N, t_load_arrow_stream_no_memory, label="arrow_stream_no_memory_map")
+    plt.plot(N, t_load_arrow_parquet, label="arrow_parquet")
+    plt.plot(N, t_load_hdf5_core, label="hdf5_core")
+    plt.plot(N, t_load_hdf5_sec2, label="hdf5_sec2")
+
+    # Add a legend
+    plt.legend()
+
+    # Add titles and labels
+    plt.xlabel("N (number of samples)")
+    plt.ylabel("t (seconds)")
+
+    # Show the plot
+    plt.savefig(f"results/v2/column_wise/{dim}/load_{dim}.pdf")  # Save as PDF
+
+    plt.clf()
+
+    plt.title("HDF5 vs Arrow Access")
+    plt.plot(N, t_access_arrow_file_memory, label="arrow_file_memory_map")
+    plt.plot(N, t_access_arrow_stream_memory, label="arrow_stream_memory_map")
+    plt.plot(N, t_access_arrow_file_no_memory, label="arrow_file_no_memory_map")
+    plt.plot(N, t_access_arrow_stream_no_memory, label="arrow_stream_no_memory_map")
+    plt.plot(N, t_access_arrow_parquet, label="arrow_parquet")
+    plt.plot(N, t_access_hdf5_core, label="hdf5_core")
+    plt.plot(N, t_access_hdf5_sec2, label="hdf5_sec2")
+
+    # Add a legend
+    plt.legend()
+
+    # Add titles and labels
+    plt.xlabel("N (number of samples)")
+    plt.ylabel("t (seconds)")
+
+    # Show the plot
+    plt.savefig(f"results/v2/column_wise/{dim}/access_{dim}.pdf")  # Save as PDF
+
+    plt.clf()
+
+    plt.title("HDF5 vs Arrow Manipulating")
+    plt.plot(N, t_manipulate_arrow_file_memory, label="arrow_file_memory_map")
+    plt.plot(N, t_manipulate_arrow_stream_memory, label="arrow_stream_memory_map")
+    plt.plot(N, t_manipulate_arrow_file_no_memory, label="arrow_file_no_memory_map")
+    plt.plot(N, t_manipulate_arrow_stream_no_memory, label="arrow_stream_no_memory_map")
+    plt.plot(N, t_manipulate_arrow_parquet, label="arrow_parquet")
+    plt.plot(N, t_manipulate_hdf5_core, label="hdf5_core")
+    plt.plot(N, t_manipulate_hdf5_sec2, label="hdf5_sec2")
+
+    # Add a legend
+    plt.legend()
+
+    # Add titles and labels
+    plt.xlabel("N (number of samples)")
+    plt.ylabel("t (seconds)")
+
+    # Show the plot
+    plt.savefig(f"results/v2/column_wise/{dim}/manipulating_{dim}.pdf")  # Save as PDF
+
+    plt.clf()
