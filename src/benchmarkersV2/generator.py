@@ -13,80 +13,79 @@ class Generator:
 
 
     def create_dataset(self, N: int, name : str, dim : int):
-            output = []
-            for i in range(N):
-                text1 = "Foto di una nebulosa"
-                text2 = "Foto infrarossi di una nebulosa"
-                image1 = np.random.rand(3,dim,dim)
-                image2 = np.random.rand(3,dim,dim)
-                image3 = np.random.rand(3,dim,dim)
-                shape = (3,dim,dim)
-    
-                
-                bb1 = np.random.rand(4)
-                bb2 = np.random.rand(4)
-                bb3 = np.random.rand(4)
-                bb4 = np.random.rand(4)
-                bb5 = np.random.rand(4)
-                image4 = np.random.rand(3,dim,dim)
-                label1 = np.random.randint(100,size=1)[0]
-
-                im1b = image1.tobytes()
-                im1b = image1.tobytes()
-                im1b = image1.tobytes()
-                im1b = image1.tobytes()
-
-                # print(np.frombuffer(im1b.as_buffer(), dtype=np.float32).shape)
-
-                sample = {
-                    "image_feature": [
-                        {
-                            "image" : image1.tobytes(),
-                            "shape" : shape,
-                            "boundingbox_feature":[{
-                                "bbox" : bb1,
-                                "image_1_feature": [{
-                                    "image" : image4.tobytes(),
-                                    "shape" : shape,
-                                }]
-                            },
-                            {
-                                "bbox" : bb2
-                            },
-                            {
-                                "bbox" : bb3,
-                                "label_feature": [{
-                                    "label" : label1
-                                }]
-                            }]
-                        },
-                        {
-                            "image" : image2.tobytes(),
-                            "shape" : shape,
-                            "boundingbox_feature":[{
-                                "bbox" : bb4
-                            },{
-                                "bbox" : bb5
-                            }]
-                        },
-                        {
-                            "image" : image3.tobytes(),
-                            "shape" : shape,
-                            "text_1_feature":[
-                                {
-                                    "text": text2
-                                }
-                            ]
-                        }
-                    ],
-                    "text_feature" : [
-                        {
-                            "text": text1
-                        }
-                    ],
-
-                }
-                output.append(sample)
+            #output = []
+            #for i in range(N):
+            text1 = "Foto di una nebulosa"
+            text2 = "Foto infrarossi di una nebulosa"
+            image1 = np.random.rand(3,dim,dim)
+            image2 = np.random.rand(3,dim,dim)
+            image3 = np.random.rand(3,dim,dim)
+            shape = (3,dim,dim)
+    #
+            #    
+            bb1 = np.random.rand(4)
+            bb2 = np.random.rand(4)
+            bb3 = np.random.rand(4)
+            bb4 = np.random.rand(4)
+            bb5 = np.random.rand(4)
+            image4 = np.random.rand(3,dim,dim)
+            label1 = np.random.randint(100,size=1)[0]
+            #im1b = image1.tobytes()
+            #im1b = image1.tobytes()
+            #im1b = image1.tobytes()
+            #im1b = image1.tobytes()
+#
+            #    # print(np.frombuffer(im1b.as_buffer(), dtype=np.float32).shape)
+#
+            #    sample = {
+            #        "image_feature": [
+            #            {
+            #                "image" : image1.tobytes(),
+            #                "shape" : shape,
+            #                "boundingbox_feature":[{
+            #                    "bbox" : bb1,
+            #                    "image_1_feature": [{
+            #                        "image" : image4.tobytes(),
+            #                        "shape" : shape,
+            #                    }]
+            #                },
+            #                {
+            #                    "bbox" : bb2
+            #                },
+            #                {
+            #                    "bbox" : bb3,
+            #                    "label_feature": [{
+            #                        "label" : label1
+            #                    }]
+            #                }]
+            #            },
+            #            {
+            #                "image" : image2.tobytes(),
+            #                "shape" : shape,
+            #                "boundingbox_feature":[{
+            #                    "bbox" : bb4
+            #                },{
+            #                    "bbox" : bb5
+            #                }]
+            #            },
+            #            {
+            #                "image" : image3.tobytes(),
+            #                "shape" : shape,
+            #                "text_1_feature":[
+            #                    {
+            #                        "text": text2
+            #                    }
+            #                ]
+            #            }
+            #        ],
+            #        "text_feature" : [
+            #            {
+            #                "text": text1
+            #            }
+            #        ],
+#
+            #    }
+            #    output.append(sample)
 
             with h5py.File(f"{name}_core.h5", 'w') as f:
             # Create image_feature group
@@ -126,7 +125,8 @@ class Generator:
                     bb2.create_dataset('bbox', data=bb2)  # Replace with actual bbox
                     
                     bb3 = boundingbox_feature1.create_group('bb3')
-                    bb3.create_dataset('bbox', data=bb3)  # Replace with actual bbox
+                    bb3ds = bb3.create_dataset('bbox', data=bb3)  # Replace with actual bbox
+                    bb3ds.attrs["label"] = label1
                     
                     label_feature = bb3.create_group('label_feature')
                     label_feature.create_dataset('label', data=label1)
@@ -154,8 +154,8 @@ class Generator:
                     text_feature = example.create_group('text_feature')
                     text_feature.create_dataset('text', data=text1)
 
-            self.table = pa.Table.from_pylist(output)
-            pq.write_table(self.table, name+".parquet")
+            #self.table = pa.Table.from_pylist(output)
+            #pq.write_table(self.table, name+".parquet")
             shutil.copy(f"{name}_core.h5", f"{name}_sec2.h5")
 
             

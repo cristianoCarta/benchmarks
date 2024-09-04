@@ -1,0 +1,8 @@
+Risultato 1: Il memory mapping comporta dei tempi maggiori rispetto all'accesso in RAM. Rimane comunque la strategia da usare per grandi dataset 
+
+Ipotesi 1: c'è ancora un'overhead di accesso di hdf5 core (balza all'occhio per 32x32) che gestiamo male con la chiusura del file? (o altre cose)
+Ipotesi 2: nell'ipotesi che hdf5 sia ottimizzato, arrow riesce a gestire le piccole immagini in memory più velocemente di hdf5. A questo punto, perché avviene il trend?
+
+
+NOTA BENE: Il memory mapping e il sec2 CONTENGONO DENTRO I TEMPI DI MANIPOLAZIONE E ACCESSO ANCHE UN LOADING. Ha senso confrontarli tra loro (anche se le strategie di loading on the fly sono diverse). 
+           Il core e la tabella in memory sono direttamente confrontabili (avendo entrambe le opzioni la RAM allocata)
