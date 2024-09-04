@@ -1,35 +1,17 @@
 ##################                 DONE            ########################################
 
-- Row wise - filtro per classe e stesse operazioni(quelle column wise) su image per quella data classe
-- Column/Row wise per operazioni su bounding box (conversione di formato)
-- Heat map di operazioni su immagini row o column wise variando N(dimensione del dataset o densità di immagini per sample) e dimensioni delle immagini
-- Rifare i benchmark f1 e f2 (colonnari) con più dataset per gruppo e non con più gruppi con un solo dataset dallo stesso nome
-- Rifare i benchmark f1 e f2 con utilizzo dell'attribute types per accedere ai nodi desiderati
-- Capire come vengono storate le info dal dataset di hugging face (file .arrow) e se stora le immagini in file di byte anche lui
+
 
 ##################                 UNDONE          ########################################
 
-- f4 : nuovo benchmark con altri parametri fissati e studio al variare di D (densità di buonding box)
 - f5 : nuovo benchmark con numero di bounding boxes per example estratto casualmente ( e per immagini)
-- f6 : nuovi benchmark con file .arrow:
-    - a: stream con/senza memory mapping
-    - b: file con/senza memory mapping
+- Cambiare la decodifica delle immagini passando per PIL e torchvision.transform
+- Caso d'uso per benchmark: usare un dataloader di pytorch
 
-##################     v2    ##########################
-Una nuova cartella benchmarksV2 dove teniamo fissa l'alberatura, variamo N (e non la densità D) e benchmarkiamo
-    .arrow file (memory mapping e non) 
-    .arrow stream (memory mapping e non) 
-    parquet 
-    HDF5 (core e sec2 senza visititems)
-
-Tutto ciò va fatto column-wise e row-wise con operazioni su immagini di diverse dimensioni. La numeriosità del dataset la prendiamo sempre
-in esame in quanto scorriamo sempre lungo N
-
-Cambiare la decodifica delle immagini passando per PIL e torchvision.transform
+- Produrre documentazione, slides e risultati organizzati dei benchmark (da presentare)
+- Capire il framework "front-end" da interfacciare con il backend scelto (gestione delle feature e motore di inferenza (caso d'uso K-NN))
 
 
-
-alternativa a visititems : get
 
 NB : nei benchmark row-wise (pyarrow) si è fissato l'indice di riga delle immagini, nota bene, potrebbero essere più di un'immagine
 NB : gestione dei None per pyarrow

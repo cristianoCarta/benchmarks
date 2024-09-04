@@ -30,7 +30,10 @@ class Generator:
                     bb4 = np.random.rand(4)
                     bb5 = np.random.rand(4)
                     
-                    label1 = np.random.randint(100,size=1)[0]
+                    if i == len(range(N)) - 1 :
+                        label1 = 10
+                    else:
+                        label1 = np.random.randint(100,size=1)[0]
        
                     sample = {
                         "image_feature": [

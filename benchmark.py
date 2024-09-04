@@ -13,7 +13,7 @@ np.random.seed(0)
 
 N = [10,100,200,300,500]
 dimensions = [32,64,125,192]
-selected_label = 10
+selected_label = 75
 iterations = 100
 
 generator = Generator()
@@ -21,7 +21,6 @@ generator = Generator()
 for dim in dimensions:
 
     ########## ROW - WISE ###############
-
     arrow_file_memory = ClockRowWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,selected_label,memory=True,stream=False)
     arrow_stream_memory = ClockRowWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,selected_label,memory=True,stream=True)
     arrow_file_no_memory = ClockRowWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,selected_label,memory=False,stream=False)
