@@ -13,10 +13,8 @@ np.random.seed(0)
 
 N = [10,100,200,300,500]
 dimensions = [32,64,125,192]
-selected_label = 75
+selected_label = 10
 iterations = 100
-
-generator = Generator()
 
 for dim in dimensions:
 
