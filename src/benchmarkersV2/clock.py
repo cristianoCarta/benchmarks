@@ -32,7 +32,6 @@ def find_max_iterations(stringa : str,file : h5py.Dataset):
     go = True
     while go:
         dataset = file.get(stringa.replace("REPLACE",str(j)))
-        print(stringa.replace("REPLACE",str(j)))
         if dataset:
             j = j + 1
             i = i + 1
@@ -515,7 +514,6 @@ class ClockBoundingBoxConversion:
                     path : str, 
                     N : List[int],
                     iterations : int,
-                    selected_label : int,
                     dim : int
                     ):
             
@@ -540,7 +538,7 @@ class ClockBoundingBoxConversion:
                 manipulated_bboxes = []
                 start_time_arrow = time.time()
                 start_access = time.time()
-                oggetti = np.array(table.column("image_feature").chunk(0).values.field("bounding_box_feature").values.field("bbox").to_pylist())
+                oggetti = np.array(table.column("image_feature").chunk(0).values.field("boundingbox_feature").values.field("bbox").to_pylist())
                 end_access = time.time()
                 inverted_bboxes = np.apply_along_axis(xycenterwh_to_xyminmax, axis=1, arr=oggetti)
                 end_time_arrow = time.time()
@@ -561,7 +559,6 @@ class ClockBoundingBoxConversion:
                     path : str, 
                     N : List[int],
                     iterations : int,
-                    selected_label : int,
                     hdf5_driver : str = None
                     ):
             
@@ -589,25 +586,17 @@ class ClockBoundingBoxConversion:
                     tmp_single_access = []
                     for i in range(item):
                         start_access = time.time()
-                        number_of_images = find_max_iterations(f"example_{i}/image_feature/imageREPLACE")
-                        number_of_bboxes = find_max_iterations(f"example_{i}/image_feature/image1/boundingbox_feature/bbREPLACE")
-                        for g in range(number_of_images):
-                            for m in range(number_of_bboxes):
+                        number_of_images = find_max_iterations(f"example_{i}/image_feature/imageREPLACE",f)
+                        number_of_bboxes = find_max_iterations(f"example_{i}/image_feature/image1/boundingbox_feature/bbREPLACE",f)
+                        for g in range(1,number_of_images+1):
+                            for m in range(1,number_of_bboxes+1):
                                 dataset = f.get(f"example_{i}/image_feature/image{g}/boundingbox_feature/bb{m}/bbox")
-                                obj = dataset[:]
-                                end_access = time.time()
-                                tmp_single_access.append(end_access-start_access)
-                                manipulated_bbox = xycenterwh_to_xyminmax(obj)
-                                manipulated_bboxes.append(manipulated_bbox)
-                        #dataset = f.get(f"example_{i}/image_feature/image1/boundingbox_feature/bb3/bbox")
-                        #if dataset and ("label" in dataset.attrs) and dataset.attrs["label"] == selected_label:
-                        #    obj = dataset[:]
-                        #    end_access = time.time()
-                        #    new_obj = np.transpose(obj)   
-                        #    new_obj = np.square(new_obj)
-                        #    new_obj = np.exp(new_obj)
-                        #    new_obj = np.transpose(new_obj)
-                        #    image_datasets.append(new_obj[:])
+                                if dataset:
+                                    obj = dataset[:]
+                                    end_access = time.time()
+                                    tmp_single_access.append(end_access-start_access)
+                                    manipulated_bbox = xycenterwh_to_xyminmax(obj)
+                                    manipulated_bboxes.append(manipulated_bbox)
                     end_time_hdf5 = time.time()
                     tmp_manipulate_hdf5.append(end_time_hdf5-start_time_hdf5)
                     tmp_access_hdf5.append(sum(tmp_single_access))
@@ -627,7 +616,6 @@ class ClockBoundingBoxConversion:
             N : List[int],
             iterations : int,
             dim : int,
-            selected_label : int,
             memory : bool = False,
             stream : bool = False):
         
@@ -654,7 +642,7 @@ class ClockBoundingBoxConversion:
                     manipulated_bboxes = []
                     start_time_arrow = time.time()
                     start_access = time.time()
-                    oggetti = np.array(table.column("image_feature").chunk(0).values.field("bounding_box_feature").values.field("bbox").to_pylist())
+                    oggetti = np.array(table.column("image_feature").chunk(0).values.field("boundingbox_feature").values.field("bbox").to_pylist())
                     end_access = time.time()
                     inverted_bboxes = np.apply_along_axis(xycenterwh_to_xyminmax, axis=1, arr=oggetti)
                     end_time_arrow = time.time()
@@ -673,7 +661,7 @@ class ClockBoundingBoxConversion:
                     manipulated_bboxes = []
                     start_time_arrow = time.time()
                     start_access = time.time()
-                    oggetti = np.array(table.column("image_feature").chunk(0).values.field("bounding_box_feature").values.field("bbox").to_pylist())
+                    oggetti = np.array(table.column("image_feature").chunk(0).values.field("boundingbox_feature").values.field("bbox").to_pylist())
                     end_access = time.time()
                     inverted_bboxes = np.apply_along_axis(xycenterwh_to_xyminmax, axis=1, arr=oggetti)
                     end_time_arrow = time.time()
@@ -692,7 +680,7 @@ class ClockBoundingBoxConversion:
                     manipulated_bboxes = []
                     start_time_arrow = time.time()
                     start_access = time.time()
-                    oggetti = np.array(table.column("image_feature").chunk(0).values.field("bounding_box_feature").values.field("bbox").to_pylist())
+                    oggetti = np.array(table.column("image_feature").chunk(0).values.field("boundingbox_feature").values.field("bbox").to_pylist())
                     end_access = time.time()
                     inverted_bboxes = np.apply_along_axis(xycenterwh_to_xyminmax, axis=1, arr=oggetti)
                     end_time_arrow = time.time()
@@ -710,7 +698,7 @@ class ClockBoundingBoxConversion:
                     manipulated_bboxes = []
                     start_time_arrow = time.time()
                     start_access = time.time()
-                    oggetti = np.array(table.column("image_feature").chunk(0).values.field("bounding_box_feature").values.field("bbox").to_pylist())
+                    oggetti = np.array(table.column("image_feature").chunk(0).values.field("boundingbox_feature").values.field("bbox").to_pylist())
                     end_access = time.time()
                     inverted_bboxes = np.apply_along_axis(xycenterwh_to_xyminmax, axis=1, arr=oggetti)
                     end_time_arrow = time.time()

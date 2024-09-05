@@ -107,52 +107,64 @@ class Generator:
                     
                     # Image 1
                     image1 = image_feature.create_group('image1')
-                    image1.create_dataset('image', data=im1)  # Replace with actual image data
+                    im1ds = image1.create_dataset('image', data=im1)  # Replace with actual image data
+                    im1ds.attrs["type"] = "image"
+
                     
                     boundingbox_feature1 = image1.create_group('boundingbox_feature')
                     
                     bb1g = boundingbox_feature1.create_group('bb1')
                     bb1ds = bb1g.create_dataset('bbox', data=bb1)  # Replace with actual bbox
-                    #bb1ds.attrs["format"] = 0
-                    
+                    bb1ds.attrs["format"] = 0
+                    bb1ds.attrs["type"] = "bbox"
+            
+                     
                     image_1_feature = bb1g.create_group('image_1_feature')
                     image_1_feature_ds = image_1_feature.create_dataset('image', data=im4)  # Replace with actual image data
                     image_1_feature_ds.attrs["type"] = "leaf_image"
                     
                     bb2g = boundingbox_feature1.create_group('bb2')
                     bb2ds = bb2g.create_dataset('bbox', data=bb2)  # Replace with actual bbox
-                    #bb2ds.attrs["format"] = 0
+                    bb2ds.attrs["format"] = 0
+                    bb2ds.attrs["type"] = "bbox"
                     
                     bb3g = boundingbox_feature1.create_group('bb3')
                     bb3ds = bb3g.create_dataset('bbox', data=bb3)  # Replace with actual bbox
                     bb3ds.attrs["label"] = label1
-                    #bb3ds.attrs["format"] = 0
+                    bb3ds.attrs["format"] = 0
+                    bb3ds.attrs["type"] = "bbox"
                     
                           
                     # Image 2
                     image2 = image_feature.create_group('image2')
-                    image2.create_dataset('image', data=im2)  # Replace with actual image data
+                    im2ds = image2.create_dataset('image', data=im2)  # Replace with actual image data
+                    im2ds.attrs["type"] = "image"
                     
                     boundingbox_feature2 = image2.create_group('boundingbox_feature')
                     
                     bb4g = boundingbox_feature2.create_group('bb4')
                     bb4ds = bb4g.create_dataset('bbox', data=bb4)  # Replace with actual bbox
-                    #bb4ds.attrs["format"] = 1
+                    bb4ds.attrs["format"] = 1
+                    bb4ds.attrs["type"] = "bbox"
                     
                     bb5g = boundingbox_feature2.create_group('bb5')
                     bb5ds = bb5g.create_dataset('bbox', data=bb5)  # Replace with actual bbox
-                    #bb5ds.attrs["format"] = 1
+                    bb5ds.attrs["format"] = 1
+                    bb5ds.attrs["type"] = "bbox"
                     
                     # Image 3
                     image3 = image_feature.create_group('image3')
-                    image3.create_dataset('image', data=im3)  # Replace with actual image data
+                    im3ds = image3.create_dataset('image', data=im3)  # Replace with actual image data
+                    im3ds.attrs["type"] = "image"
                     
                     text_1_feature = image3.create_group('text_1_feature')
-                    text_1_feature.create_dataset('text', data=text2)
+                    text1ds = text_1_feature.create_dataset('text', data=text2)
+                    text1ds.attrs["type"] = "text"
                     
                     # Text feature
                     text_feature = example.create_group('text_feature')
-                    text_feature.create_dataset('text', data=text1)
+                    txtds = text_feature.create_dataset('text', data=text1)
+                    txtds.attrs["type"] = "text"
 
             self.table = pa.Table.from_pylist(output)
             pq.write_table(self.table, name+".parquet")
