@@ -72,6 +72,7 @@ for dim in dimensions:
 
 N_label = [str(item) for item in N]
 d_label = [str(item) for item in dimensions]
+normC = mcolors.Normalize(vmin=0,vmax=1)
 
 ################# LOAD ##################
 
@@ -93,28 +94,28 @@ vmax = max(data1.max(),  data2.max(),data3.max(),data4.max())
 norm = mcolors.Normalize(vmin=vmin, vmax=vmax)
 
 # First heatmap
-cax1 = ax[0].imshow(data1, cmap='inferno', interpolation='gaussian')
+cax1 = ax[0].imshow(data1, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[0].set_title('core / stream_no_memory_map')
 fig.colorbar(cax1, ax=ax[0], orientation='vertical')
 ax[0].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
 ax[0].set_yticks(ticks=np.arange(len(d_label)), labels=d_label)
 
 # Second heatmap
-cax2 = ax[1].imshow(data2, cmap='inferno', interpolation='gaussian')
+cax2 = ax[1].imshow(data2, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[1].set_title('sec2 / stream_memory_map')
 fig.colorbar(cax2, ax=ax[1], orientation='vertical')
 ax[1].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
 ax[1].set_yticks(ticks=np.arange(len(d_label)), labels=d_label)
 
 # Third heatmap
-cax3 = ax[2].imshow(data3, cmap='inferno', interpolation='gaussian')
+cax3 = ax[2].imshow(data3, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[2].set_title('core / parquet')
 fig.colorbar(cax3, ax=ax[2], orientation='vertical')
 ax[2].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
 ax[2].set_yticks(ticks=np.arange(len(d_label)), labels=d_label)
 
 # Third heatmap
-cax3 = ax[3].imshow(data4, cmap='inferno', interpolation='gaussian')
+cax3 = ax[3].imshow(data4, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[3].set_title('core / stream_memory_map')
 fig.colorbar(cax3, ax=ax[3], orientation='vertical')
 ax[3].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
@@ -146,28 +147,28 @@ vmax = max(data1.max(),  data2.max(),data3.max(),data4.max())
 norm = mcolors.Normalize(vmin=vmin, vmax=vmax)
 
 # First heatmap
-cax1 = ax[0].imshow(data1, cmap='inferno', interpolation='gaussian')
+cax1 = ax[0].imshow(data1, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[0].set_title('core / stream_no_memory_map')
 fig.colorbar(cax1, ax=ax[0], orientation='vertical')
 ax[0].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
 ax[0].set_yticks(ticks=np.arange(len(d_label)), labels=d_label)
 
 # Second heatmap
-cax2 = ax[1].imshow(data2, cmap='inferno', interpolation='gaussian')
+cax2 = ax[1].imshow(data2, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[1].set_title('sec2 / stream_memory_map')
 fig.colorbar(cax2, ax=ax[1], orientation='vertical')
 ax[1].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
 ax[1].set_yticks(ticks=np.arange(len(d_label)), labels=d_label)
 
 # Third heatmap
-cax3 = ax[2].imshow(data3, cmap='inferno', interpolation='gaussian')
+cax3 = ax[2].imshow(data3, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[2].set_title('core / parquet')
 fig.colorbar(cax3, ax=ax[2], orientation='vertical')
 ax[2].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
 ax[2].set_yticks(ticks=np.arange(len(d_label)), labels=d_label)
 
 # Third heatmap
-cax3 = ax[3].imshow(data4, cmap='inferno', interpolation='gaussian')
+cax3 = ax[3].imshow(data4, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[3].set_title('core / stream_memory_map')
 fig.colorbar(cax3, ax=ax[3], orientation='vertical')
 ax[3].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
@@ -200,28 +201,28 @@ vmax = max(data1.max(),  data2.max(),data3.max(),data4.max())
 norm = mcolors.Normalize(vmin=vmin, vmax=vmax)
 
 # First heatmap
-cax1 = ax[0].imshow(data1, cmap='inferno', interpolation='gaussian')
+cax1 = ax[0].imshow(data1, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[0].set_title('core / stream_no_memory_map')
 fig.colorbar(cax1, ax=ax[0], orientation='vertical')
 ax[0].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
 ax[0].set_yticks(ticks=np.arange(len(d_label)), labels=d_label)
 
 # Second heatmap
-cax2 = ax[1].imshow(data2, cmap='inferno', interpolation='gaussian')
+cax2 = ax[1].imshow(data2, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[1].set_title('sec2 / stream_memory_map')
 fig.colorbar(cax2, ax=ax[1], orientation='vertical')
 ax[1].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
 ax[1].set_yticks(ticks=np.arange(len(d_label)), labels=d_label)
 
 # Third heatmap
-cax3 = ax[2].imshow(data3, cmap='inferno', interpolation='gaussian')
+cax3 = ax[2].imshow(data3, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[2].set_title('core / parquet')
 fig.colorbar(cax3, ax=ax[2], orientation='vertical')
 ax[2].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
 ax[2].set_yticks(ticks=np.arange(len(d_label)), labels=d_label)
 
 # Third heatmap
-cax3 = ax[3].imshow(data4, cmap='inferno', interpolation='gaussian')
+cax3 = ax[3].imshow(data4, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[3].set_title('core / stream_memory_map')
 fig.colorbar(cax3, ax=ax[3], orientation='vertical')
 ax[3].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
@@ -306,28 +307,28 @@ vmax = max(data1.max(),  data2.max(),data3.max(),data4.max())
 norm = mcolors.Normalize(vmin=vmin, vmax=vmax)
 
 # First heatmap
-cax1 = ax[0].imshow(data1, cmap='inferno', interpolation='gaussian')
+cax1 = ax[0].imshow(data1, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[0].set_title('core / stream_no_memory_map')
 fig.colorbar(cax1, ax=ax[0], orientation='vertical')
 ax[0].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
 ax[0].set_yticks(ticks=np.arange(len(d_label)), labels=d_label)
 
 # Second heatmap
-cax2 = ax[1].imshow(data2, cmap='inferno', interpolation='gaussian')
+cax2 = ax[1].imshow(data2, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[1].set_title('sec2 / stream_memory_map')
 fig.colorbar(cax2, ax=ax[1], orientation='vertical')
 ax[1].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
 ax[1].set_yticks(ticks=np.arange(len(d_label)), labels=d_label)
 
 # Third heatmap
-cax3 = ax[2].imshow(data3, cmap='inferno', interpolation='gaussian')
+cax3 = ax[2].imshow(data3, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[2].set_title('core / parquet')
 fig.colorbar(cax3, ax=ax[2], orientation='vertical')
 ax[2].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
 ax[2].set_yticks(ticks=np.arange(len(d_label)), labels=d_label)
 
 # Third heatmap
-cax3 = ax[3].imshow(data4, cmap='inferno', interpolation='gaussian')
+cax3 = ax[3].imshow(data4, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[3].set_title('core / stream_memory_map')
 fig.colorbar(cax3, ax=ax[3], orientation='vertical')
 ax[3].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
@@ -359,28 +360,28 @@ vmax = max(data1.max(),  data2.max(),data3.max(),data4.max())
 norm = mcolors.Normalize(vmin=vmin, vmax=vmax)
 
 # First heatmap
-cax1 = ax[0].imshow(data1, cmap='inferno', interpolation='gaussian')
+cax1 = ax[0].imshow(data1, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[0].set_title('core / stream_no_memory_map')
 fig.colorbar(cax1, ax=ax[0], orientation='vertical')
 ax[0].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
 ax[0].set_yticks(ticks=np.arange(len(d_label)), labels=d_label)
 
 # Second heatmap
-cax2 = ax[1].imshow(data2, cmap='inferno', interpolation='gaussian')
+cax2 = ax[1].imshow(data2, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[1].set_title('sec2 / stream_memory_map')
 fig.colorbar(cax2, ax=ax[1], orientation='vertical')
 ax[1].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
 ax[1].set_yticks(ticks=np.arange(len(d_label)), labels=d_label)
 
 # Third heatmap
-cax3 = ax[2].imshow(data3, cmap='inferno', interpolation='gaussian')
+cax3 = ax[2].imshow(data3, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[2].set_title('core / parquet')
 fig.colorbar(cax3, ax=ax[2], orientation='vertical')
 ax[2].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
 ax[2].set_yticks(ticks=np.arange(len(d_label)), labels=d_label)
 
 # Third heatmap
-cax3 = ax[3].imshow(data4, cmap='inferno', interpolation='gaussian')
+cax3 = ax[3].imshow(data4, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[3].set_title('core / stream_memory_map')
 fig.colorbar(cax3, ax=ax[3], orientation='vertical')
 ax[3].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
@@ -413,28 +414,28 @@ vmax = max(data1.max(),  data2.max(),data3.max(),data4.max())
 norm = mcolors.Normalize(vmin=vmin, vmax=vmax)
 
 # First heatmap
-cax1 = ax[0].imshow(data1, cmap='inferno', interpolation='gaussian')
+cax1 = ax[0].imshow(data1, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[0].set_title('core / stream_no_memory_map')
 fig.colorbar(cax1, ax=ax[0], orientation='vertical')
 ax[0].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
 ax[0].set_yticks(ticks=np.arange(len(d_label)), labels=d_label)
 
 # Second heatmap
-cax2 = ax[1].imshow(data2, cmap='inferno', interpolation='gaussian')
+cax2 = ax[1].imshow(data2, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[1].set_title('sec2 / stream_memory_map')
 fig.colorbar(cax2, ax=ax[1], orientation='vertical')
 ax[1].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
 ax[1].set_yticks(ticks=np.arange(len(d_label)), labels=d_label)
 
 # Third heatmap
-cax3 = ax[2].imshow(data3, cmap='inferno', interpolation='gaussian')
+cax3 = ax[2].imshow(data3, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[2].set_title('core / parquet')
 fig.colorbar(cax3, ax=ax[2], orientation='vertical')
 ax[2].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
 ax[2].set_yticks(ticks=np.arange(len(d_label)), labels=d_label)
 
 # Third heatmap
-cax3 = ax[3].imshow(data4, cmap='inferno', interpolation='gaussian')
+cax3 = ax[3].imshow(data4, cmap='inferno', interpolation='gaussian',norm=normC)
 ax[3].set_title('core / stream_memory_map')
 fig.colorbar(cax3, ax=ax[3], orientation='vertical')
 ax[3].set_xticks(ticks=np.arange(len(N_label)), labels=N_label,rotation=45)
