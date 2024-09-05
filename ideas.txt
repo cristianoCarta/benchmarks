@@ -16,3 +16,9 @@
 NB : nei benchmark row-wise (pyarrow) si è fissato l'indice di riga delle immagini, nota bene, potrebbero essere più di un'immagine
 NB : gestione dei None per pyarrow
 NB : per le BOUNDING BOX: mettere direttamente il formato (YOLO = 0 ad esempio) come quinto elemento della bouding box? Aumenterebbe l'efficienza sia di HDF5 che di Pyarrow
+
+
+data 1 : core - no-memory-stream
+data 2 : sec2 - memory-stream
+data 3 : core - parquet
+data 4 : core - memory-stream
