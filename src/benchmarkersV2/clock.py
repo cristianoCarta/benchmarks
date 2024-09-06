@@ -541,8 +541,8 @@ class ClockBoundingBoxConversion:
                 oggetti = np.array(table.column("image_feature").chunk(0).values.field("boundingbox_feature").values.field("bbox").to_pylist())
                 end_access = time.time()
                 inverted_bboxes = np.apply_along_axis(xycenterwh_to_xyminmax, axis=1, arr=oggetti)
-                end_time_arrow = time.time()
                 manipulated_bboxes.append(inverted_bboxes)
+                end_time_arrow = time.time()
                 tmp_manipulate_arrow.append(end_time_arrow-start_time_arrow)
                 tmp_access_arrow.append(end_access - start_access)
 
@@ -645,8 +645,8 @@ class ClockBoundingBoxConversion:
                     oggetti = np.array(table.column("image_feature").chunk(0).values.field("boundingbox_feature").values.field("bbox").to_pylist())
                     end_access = time.time()
                     inverted_bboxes = np.apply_along_axis(xycenterwh_to_xyminmax, axis=1, arr=oggetti)
-                    end_time_arrow = time.time()
                     manipulated_bboxes.append(inverted_bboxes)
+                    end_time_arrow = time.time()
                     tmp_manipulate.append(end_time_arrow-start_time_arrow)
                     tmp_access.append(end_access - start_access)
 
@@ -664,8 +664,8 @@ class ClockBoundingBoxConversion:
                     oggetti = np.array(table.column("image_feature").chunk(0).values.field("boundingbox_feature").values.field("bbox").to_pylist())
                     end_access = time.time()
                     inverted_bboxes = np.apply_along_axis(xycenterwh_to_xyminmax, axis=1, arr=oggetti)
-                    end_time_arrow = time.time()
                     manipulated_bboxes.append(inverted_bboxes)
+                    end_time_arrow = time.time()
                     tmp_manipulate.append(end_time_arrow-start_time_arrow)
                     tmp_access.append(end_access - start_access)
 
@@ -683,8 +683,8 @@ class ClockBoundingBoxConversion:
                     oggetti = np.array(table.column("image_feature").chunk(0).values.field("boundingbox_feature").values.field("bbox").to_pylist())
                     end_access = time.time()
                     inverted_bboxes = np.apply_along_axis(xycenterwh_to_xyminmax, axis=1, arr=oggetti)
-                    end_time_arrow = time.time()
                     manipulated_bboxes.append(inverted_bboxes)
+                    end_time_arrow = time.time()
                     tmp_manipulate.append(end_time_arrow-start_time_arrow)
                     tmp_access.append(end_access - start_access)
 
@@ -701,8 +701,8 @@ class ClockBoundingBoxConversion:
                     oggetti = np.array(table.column("image_feature").chunk(0).values.field("boundingbox_feature").values.field("bbox").to_pylist())
                     end_access = time.time()
                     inverted_bboxes = np.apply_along_axis(xycenterwh_to_xyminmax, axis=1, arr=oggetti)
-                    end_time_arrow = time.time()
                     manipulated_bboxes.append(inverted_bboxes)
+                    end_time_arrow = time.time()
                     tmp_manipulate.append(end_time_arrow-start_time_arrow)
                     tmp_access.append(end_access - start_access)
                 else:
