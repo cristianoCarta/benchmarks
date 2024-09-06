@@ -13,18 +13,27 @@ np.random.seed(0)
 
 N = [10,100,200,300,500]
 dimensions = [32,64,125,192]
+
 selected_label = 10
 iterations = 100
 
 for dim in dimensions:
 
     ########## ROW - WISE ###############
+    print("ROW-WISE STARTED")
+    print(f"ARROW FILE MEMORY {dim}")
     arrow_file_memory = ClockRowWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,selected_label,memory=True,stream=False)
+    print(f"ARROW STREAM MEMORY {dim}")
     arrow_stream_memory = ClockRowWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,selected_label,memory=True,stream=True)
+    print(f"ARROW FILE NO MEMORY {dim}")
     arrow_file_no_memory = ClockRowWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,selected_label,memory=False,stream=False)
+    print(f"ARROW STREAM NO MEMORY {dim}")
     arrow_stream_no_memory = ClockRowWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,selected_label,memory=False,stream=True)
+    print(f"ARROW PARQUET {dim}")
     arrow_parquet = ClockRowWise().benchmark_parquet(f"outputs/v2/{dim}/ds",N,iterations,selected_label,dim)
+    print(f"ARROW HDF5 CORE {dim}")
     hdf5_core = ClockRowWise().benchmark_hdf5(f"outputs/v2/{dim}/ds",N,iterations,selected_label,hdf5_driver="core")
+    print(f"ARROW HDF5 SEC2 {dim}")
     hdf5_sec2 = ClockRowWise().benchmark_hdf5(f"outputs/v2/{dim}/ds",N,iterations,selected_label,hdf5_driver="sec2")
 
     t_load_arrow_file_memory = arrow_file_memory.t_load
@@ -141,15 +150,23 @@ for dim in dimensions:
 
 
     ############### COLUMN - WISE #######################
-
+    print("COLUMN-WISE STARTED")
+    print(f"ARROW FILE MEMORY {dim}")
     arrow_file_memory = ClockColumnWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,memory=True,stream=False)
+    print(f"ARROW STREAM MEMORY {dim}")
     arrow_stream_memory = ClockColumnWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,memory=True,stream=True)
+    print(f"ARROW FILE NO MEMORY {dim}")
     arrow_file_no_memory = ClockColumnWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,memory=False,stream=False)
+    print(f"ARROW STREAM NO MEMORY {dim}")
     arrow_stream_no_memory = ClockColumnWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,memory=False,stream=True)
+    print(f"ARROW PARQUET {dim}")
     arrow_parquet = ClockColumnWise().benchmark_parquet(f"outputs/v2/{dim}/ds",N,iterations,dim)
+    print(f"ARROW HDF5 CORE {dim}")
     hdf5_core = ClockColumnWise().benchmark_hdf5(f"outputs/v2/{dim}/ds",N,iterations,hdf5_driver="core")
+    print(f"ARROW HDF5 SEC2 {dim}")
     hdf5_sec2 = ClockColumnWise().benchmark_hdf5(f"outputs/v2/{dim}/ds",N,iterations,hdf5_driver="sec2")
 
+    
     t_load_arrow_file_memory = arrow_file_memory.t_load
     t_load_arrow_stream_memory = arrow_stream_memory.t_load
     t_load_arrow_file_no_memory = arrow_file_no_memory.t_load
@@ -263,14 +280,23 @@ for dim in dimensions:
 
 
 ########## BOUNDING BOX ##############
-    
+
+    print("BBOX STARTED")
+    print(f"ARROW FILE MEMORY {dim}")
     arrow_file_memory = ClockBoundingBoxConversion().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,memory=True,stream=False)
+    print(f"ARROW STREAM MEMORY {dim}")
     arrow_stream_memory = ClockBoundingBoxConversion().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,memory=True,stream=True)
+    print(f"ARROW FILE NO MEMORY {dim}")
     arrow_file_no_memory = ClockBoundingBoxConversion().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,memory=False,stream=False)
+    print(f"ARROW STREAM NO MEMORY {dim}")
     arrow_stream_no_memory = ClockBoundingBoxConversion().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,memory=False,stream=True)
+    print(f"ARROW PARQUET {dim}")
     arrow_parquet = ClockBoundingBoxConversion().benchmark_parquet(f"outputs/v2/{dim}/ds",N,iterations)
+    print(f"ARROW HDF5 CORE {dim}")
     hdf5_core = ClockBoundingBoxConversion().benchmark_hdf5(f"outputs/v2/{dim}/ds",N,iterations,hdf5_driver="core")
+    print(f"ARROW HDF5 SEC2 {dim}")
     hdf5_sec2 = ClockBoundingBoxConversion().benchmark_hdf5(f"outputs/v2/{dim}/ds",N,iterations,hdf5_driver="sec2")
+
 
     t_load_arrow_file_memory = arrow_file_memory.t_load
     t_load_arrow_stream_memory = arrow_stream_memory.t_load
