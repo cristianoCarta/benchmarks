@@ -614,7 +614,6 @@ class ClockBoundingBoxConversion:
             path : str, 
             N : List[int],
             iterations : int,
-            dim : int,
             memory : bool = False,
             stream : bool = False):
         

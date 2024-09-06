@@ -264,11 +264,11 @@ for dim in dimensions:
 
 ########## BOUNDING BOX ##############
     
-    arrow_file_memory = ClockBoundingBoxConversion().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,memory=True,stream=False)
-    arrow_stream_memory = ClockBoundingBoxConversion().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,memory=True,stream=True)
-    arrow_file_no_memory = ClockBoundingBoxConversion().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,memory=False,stream=False)
-    arrow_stream_no_memory = ClockBoundingBoxConversion().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,memory=False,stream=True)
-    arrow_parquet = ClockBoundingBoxConversion().benchmark_parquet(f"outputs/v2/{dim}/ds",N,iterations,dim)
+    arrow_file_memory = ClockBoundingBoxConversion().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,memory=True,stream=False)
+    arrow_stream_memory = ClockBoundingBoxConversion().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,memory=True,stream=True)
+    arrow_file_no_memory = ClockBoundingBoxConversion().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,memory=False,stream=False)
+    arrow_stream_no_memory = ClockBoundingBoxConversion().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,memory=False,stream=True)
+    arrow_parquet = ClockBoundingBoxConversion().benchmark_parquet(f"outputs/v2/{dim}/ds",N,iterations)
     hdf5_core = ClockBoundingBoxConversion().benchmark_hdf5(f"outputs/v2/{dim}/ds",N,iterations,hdf5_driver="core")
     hdf5_sec2 = ClockBoundingBoxConversion().benchmark_hdf5(f"outputs/v2/{dim}/ds",N,iterations,hdf5_driver="sec2")
 
