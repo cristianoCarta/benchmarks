@@ -1,0 +1,18 @@
+1)
+Tutte le immagini: al di là del path, estraggo tutte le feature di un determinato tipo
+
+2)
+Struttura nota: l'utente può indicare il nodo preciso nella struttura. I diversi tipi di struttura presenti nel dataset vengono tutti presentati
+
+3)
+Creazione di possibile struttura o sottostruttura: l'utente "disegna" una struttura che viene cercata all'interno dei vari sample (generazione dei path a partire da un albero NB senza cardinalità)
+
+NB: implementare le query anche con i filtri sugli ATTRIBUTI(o gli attributi hd5f o gli argomenti degli struct in arrow) delle feature (ad esempio, l'attributo "label" della "class_feature")
+
+4)
+Conoscenza del contesto: aiutare l'utente a capire quali cluster di strutture/tipo_di_nodo di sample esistono nel dataset
+
+
+1) 2) 3) avranno come output una feature estratta dai campioni che corrispondono al path ottenuto con le varie tecniche di query. 
+La feature estratta andrà passata alla parte di motore di inferenza (Action) per l'estrazione di nuove feature (come gli embedding) o altri 
+casi d'uso come l'integrazione tra due dataset.
