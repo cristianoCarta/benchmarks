@@ -513,8 +513,7 @@ class ClockBoundingBoxConversion:
     def benchmark_parquet(self,
                     path : str, 
                     N : List[int],
-                    iterations : int,
-                    dim : int
+                    iterations : int
                     ):
             
         t_load_arrow = []
