@@ -31,9 +31,9 @@ for dim in dimensions:
     arrow_stream_no_memory = ClockRowWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,selected_label,memory=False,stream=True)
     print(f"ARROW PARQUET {dim}")
     arrow_parquet = ClockRowWise().benchmark_parquet(f"outputs/v2/{dim}/ds",N,iterations,selected_label,dim)
-    print(f"ARROW HDF5 CORE {dim}")
+    print(f"HDF5 CORE {dim}")
     hdf5_core = ClockRowWise().benchmark_hdf5(f"outputs/v2/{dim}/ds",N,iterations,selected_label,hdf5_driver="core")
-    print(f"ARROW HDF5 SEC2 {dim}")
+    print(f"HDF5 SEC2 {dim}")
     hdf5_sec2 = ClockRowWise().benchmark_hdf5(f"outputs/v2/{dim}/ds",N,iterations,selected_label,hdf5_driver="sec2")
 
     t_load_arrow_file_memory = arrow_file_memory.t_load
@@ -161,9 +161,9 @@ for dim in dimensions:
     arrow_stream_no_memory = ClockColumnWise().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,dim,memory=False,stream=True)
     print(f"ARROW PARQUET {dim}")
     arrow_parquet = ClockColumnWise().benchmark_parquet(f"outputs/v2/{dim}/ds",N,iterations,dim)
-    print(f"ARROW HDF5 CORE {dim}")
+    print(f"HDF5 CORE {dim}")
     hdf5_core = ClockColumnWise().benchmark_hdf5(f"outputs/v2/{dim}/ds",N,iterations,hdf5_driver="core")
-    print(f"ARROW HDF5 SEC2 {dim}")
+    print(f"HDF5 SEC2 {dim}")
     hdf5_sec2 = ClockColumnWise().benchmark_hdf5(f"outputs/v2/{dim}/ds",N,iterations,hdf5_driver="sec2")
 
     
@@ -292,10 +292,14 @@ for dim in dimensions:
     arrow_stream_no_memory = ClockBoundingBoxConversion().benchmark_arrow(f"outputs/v2/{dim}/ds",N,iterations,memory=False,stream=True)
     print(f"ARROW PARQUET {dim}")
     arrow_parquet = ClockBoundingBoxConversion().benchmark_parquet(f"outputs/v2/{dim}/ds",N,iterations)
-    print(f"ARROW HDF5 CORE {dim}")
+    print(f"HDF5 CORE {dim}")
     hdf5_core = ClockBoundingBoxConversion().benchmark_hdf5(f"outputs/v2/{dim}/ds",N,iterations,hdf5_driver="core")
-    print(f"ARROW HDF5 SEC2 {dim}")
+    print(f"HDF5 SEC2 {dim}")
     hdf5_sec2 = ClockBoundingBoxConversion().benchmark_hdf5(f"outputs/v2/{dim}/ds",N,iterations,hdf5_driver="sec2")
+    print(f"HDF5 CORE VISIT {dim}")
+    hdf5_core_visit = ClockBoundingBoxConversion().benchmark_hdf5_visit_items(f"outputs/v2/{dim}/ds",N,iterations,hdf5_driver="core")
+    print(f"HDF5 SEC2 VISIT {dim}")
+    hdf5_sec2_visit = ClockBoundingBoxConversion().benchmark_hdf5_visit_items(f"outputs/v2/{dim}/ds",N,iterations,hdf5_driver="sec2")
 
 
     t_load_arrow_file_memory = arrow_file_memory.t_load
@@ -305,6 +309,9 @@ for dim in dimensions:
     t_load_arrow_parquet = arrow_parquet.t_load
     t_load_hdf5_core = hdf5_core.t_load
     t_load_hdf5_sec2 = hdf5_sec2.t_load
+    t_load_hdf5_core_visit = hdf5_core_visit.t_load
+    t_load_hdf5_sec2_visit = hdf5_sec2_visit.t_load
+
 
     t_access_arrow_file_memory = arrow_file_memory.t_access
     t_access_arrow_stream_memory = arrow_stream_memory.t_access
@@ -313,6 +320,9 @@ for dim in dimensions:
     t_access_arrow_parquet = arrow_parquet.t_access
     t_access_hdf5_core = hdf5_core.t_access
     t_access_hdf5_sec2 = hdf5_sec2.t_access
+    t_access_hdf5_core_visit = hdf5_core_visit.t_access
+    t_access_hdf5_sec2_visit = hdf5_sec2_visit.t_access
+
 
     t_manipulate_arrow_file_memory = arrow_file_memory.t_manipulate
     t_manipulate_arrow_stream_memory = arrow_stream_memory.t_manipulate
@@ -321,6 +331,8 @@ for dim in dimensions:
     t_manipulate_arrow_parquet = arrow_parquet.t_manipulate
     t_manipulate_hdf5_core = hdf5_core.t_manipulate
     t_manipulate_hdf5_sec2 = hdf5_sec2.t_manipulate
+    t_manipulate_hdf5_core_visit = hdf5_core_visit.t_manipulate
+    t_manipulate_hdf5_sec2_visit = hdf5_sec2_visit.t_manipulate
 
     np.save(f"results/v2/bounding_box/{dim}/t_load_arrow_file_memory.npy",t_load_arrow_file_memory)
     np.save(f"results/v2/bounding_box/{dim}/t_load_arrow_stream_memory.npy",t_load_arrow_stream_memory)
@@ -329,6 +341,8 @@ for dim in dimensions:
     np.save(f"results/v2/bounding_box/{dim}/t_load_arrow_parquet.npy",t_load_arrow_parquet)
     np.save(f"results/v2/bounding_box/{dim}/t_load_hdf5_core.npy",t_load_hdf5_core)
     np.save(f"results/v2/bounding_box/{dim}/t_load_hdf5_sec2.npy",t_load_hdf5_sec2)
+    np.save(f"results/v2/bounding_box/{dim}/t_load_hdf5_core_visit.npy",t_load_hdf5_core_visit)
+    np.save(f"results/v2/bounding_box/{dim}/t_load_hdf5_sec2_visit.npy",t_load_hdf5_sec2_visit)
 
     np.save(f"results/v2/bounding_box/{dim}/t_access_arrow_file_memory.npy",t_access_arrow_file_memory)
     np.save(f"results/v2/bounding_box/{dim}/t_access_arrow_stream_memory.npy",t_access_arrow_stream_memory)
@@ -337,6 +351,8 @@ for dim in dimensions:
     np.save(f"results/v2/bounding_box/{dim}/t_access_arrow_parquet.npy",t_access_arrow_parquet)
     np.save(f"results/v2/bounding_box/{dim}/t_access_hdf5_core.npy",t_access_hdf5_core)
     np.save(f"results/v2/bounding_box/{dim}/t_access_hdf5_sec2.npy",t_access_hdf5_sec2)
+    np.save(f"results/v2/bounding_box/{dim}/t_access_hdf5_core_visit.npy",t_access_hdf5_core_visit)
+    np.save(f"results/v2/bounding_box/{dim}/t_access_hdf5_sec2_visit.npy",t_access_hdf5_sec2_visit)
 
     np.save(f"results/v2/bounding_box/{dim}/t_manipulate_arrow_file_memory.npy",t_manipulate_arrow_file_memory)
     np.save(f"results/v2/bounding_box/{dim}/t_manipulate_arrow_stream_memory.npy",t_manipulate_arrow_stream_memory)
@@ -345,6 +361,8 @@ for dim in dimensions:
     np.save(f"results/v2/bounding_box/{dim}/t_manipulate_arrow_parquet.npy",t_manipulate_arrow_parquet)
     np.save(f"results/v2/bounding_box/{dim}/t_manipulate_hdf5_core.npy",t_manipulate_hdf5_core)
     np.save(f"results/v2/bounding_box/{dim}/t_manipulate_hdf5_sec2.npy",t_manipulate_hdf5_sec2)
+    np.save(f"results/v2/bounding_box/{dim}/t_manipulate_hdf5_core_visit.npy",t_manipulate_hdf5_core_visit)
+    np.save(f"results/v2/bounding_box/{dim}/t_manipulate_hdf5_sec2_visit.npy",t_manipulate_hdf5_sec2_visit)
 
     plt.title("HDF5 vs Arrow Loading")
     plt.plot(N, t_load_arrow_file_memory, label="arrow_file_memory_map")
@@ -354,6 +372,8 @@ for dim in dimensions:
     plt.plot(N, t_load_arrow_parquet, label="arrow_parquet")
     plt.plot(N, t_load_hdf5_core, label="hdf5_core")
     plt.plot(N, t_load_hdf5_sec2, label="hdf5_sec2")
+    plt.plot(N, t_load_hdf5_core_visit, label="hdf5_core_visit")
+    plt.plot(N, t_load_hdf5_sec2_visit, label="hdf5_sec2_visit")
 
     # Add a legend
     plt.legend()
@@ -375,6 +395,8 @@ for dim in dimensions:
     plt.plot(N, t_access_arrow_parquet, label="arrow_parquet")
     plt.plot(N, t_access_hdf5_core, label="hdf5_core")
     plt.plot(N, t_access_hdf5_sec2, label="hdf5_sec2")
+    plt.plot(N, t_access_hdf5_core_visit, label="hdf5_core_visit")
+    plt.plot(N, t_access_hdf5_sec2_visit, label="hdf5_sec2_visit")
 
     # Add a legend
     plt.legend()
@@ -396,6 +418,8 @@ for dim in dimensions:
     plt.plot(N, t_manipulate_arrow_parquet, label="arrow_parquet")
     plt.plot(N, t_manipulate_hdf5_core, label="hdf5_core")
     plt.plot(N, t_manipulate_hdf5_sec2, label="hdf5_sec2")
+    plt.plot(N, t_manipulate_hdf5_core_visit, label="hdf5_core_visit")
+    plt.plot(N, t_manipulate_hdf5_sec2_visit, label="hdf5_sec2_visit")
 
     # Add a legend
     plt.legend()
