@@ -27,35 +27,37 @@ for dim in dimensions:
     print(f"HDF5 SEC2 VISIT {dim}")
     hdf5_sec2_visit = ClockBoundingBoxConversion().benchmark_hdf5_visit_items(f"outputs/v2/{dim}/ds",N,iterations,hdf5_driver="sec2")
 
-    t_load_arrow_file_memory = np.load("dim")
-    t_load_arrow_stream_memory = np.load("dim")
-    t_load_arrow_file_no_memory = np.load("dim")
-    t_load_arrow_stream_no_memory = np.load("dim")
-    t_load_arrow_parquet = np.load("dim")
-    t_load_hdf5_core = np.load("dim")
-    t_load_hdf5_sec2 = np.load("dim")
+    t_load_arrow_file_memory = np.load(f"v2_results_robi/bounding_box/{dim}/t_load_arrow_file_memory.npy")
+    t_load_arrow_stream_memory = np.load(f"v2_results_robi/bounding_box/{dim}/t_load_arrow_stream_memory.npy")
+    t_load_arrow_file_no_memory = np.load(f"v2_results_robi/bounding_box/{dim}/t_load_arrow_file_no_memory.npy")
+    t_load_arrow_stream_no_memory = np.load(f"v2_results_robi/bounding_box/{dim}/t_load_arrow_stream_no_memory.npy")
+    t_load_arrow_parquet = np.load(f"v2_results_robi/bounding_box/{dim}/t_load_arrow_parquet.npy")
+    t_load_hdf5_core = np.load(f"v2_results_robi/bounding_box/{dim}/t_load_hdf5_core.npy")
+    t_load_hdf5_sec2 = np.load(f"v2_results_robi/bounding_box/{dim}/t_load_hdf5_sec2.npy")
 
     t_load_hdf5_core_visit = hdf5_core_visit.t_load
     t_load_hdf5_sec2_visit = hdf5_sec2_visit.t_load
 
-    t_access_arrow_file_memory = np.load("dim")
-    t_access_arrow_stream_memory = np.load("dim")
-    t_access_arrow_file_no_memory = np.load("dim")
-    t_access_arrow_stream_no_memory = np.load("dim")
-    t_access_arrow_parquet = np.load("dim")
-    t_access_hdf5_core = np.load("dim")
-    t_access_hdf5_sec2 = np.load("dim")
+    t_access_arrow_file_memory = np.load(f"v2_results_robi/bounding_box/{dim}/t_access_arrow_file_memory.npy")
+    t_access_arrow_stream_memory = np.load(f"v2_results_robi/bounding_box/{dim}/t_access_arrow_stream_memory.npy")
+    t_access_arrow_file_no_memory = np.load(f"v2_results_robi/bounding_box/{dim}/t_access_arrow_file_no_memory.npy")
+    t_access_arrow_stream_no_memory = np.load(f"v2_results_robi/bounding_box/{dim}/t_access_arrow_stream_no_memory.npy")
+    t_access_arrow_parquet = np.load(f"v2_results_robi/bounding_box/{dim}/t_access_arrow_parquet.npy")
+    t_access_hdf5_core = np.load(f"v2_results_robi/bounding_box/{dim}/t_access_hdf5_core.npy")
+    t_access_hdf5_sec2 = np.load(f"v2_results_robi/bounding_box/{dim}/t_access_hdf5_sec2.npy")
+
 
     t_access_hdf5_core_visit = hdf5_core_visit.t_access
     t_access_hdf5_sec2_visit = hdf5_sec2_visit.t_access
 
-    t_manipulate_arrow_file_memory = np.load("dim")
-    t_manipulate_arrow_stream_memory = np.load("dim")
-    t_manipulate_arrow_file_no_memory = np.load("dim")
-    t_manipulate_arrow_stream_no_memory = np.load("dim")
-    t_manipulate_arrow_parquet = np.load("dim")
-    t_manipulate_hdf5_core = np.load("dim")
-    t_manipulate_hdf5_sec2 = np.load("dim")
+    t_manipulate_arrow_file_memory = np.load(f"v2_results_robi/bounding_box/{dim}/t_manipulate_arrow_file_memory.npy")
+    t_manipulate_arrow_stream_memory = np.load(f"v2_results_robi/bounding_box/{dim}/t_manipulate_arrow_stream_memory.npy")
+    t_manipulate_arrow_file_no_memory = np.load(f"v2_results_robi/bounding_box/{dim}/t_manipulate_arrow_file_no_memory.npy")
+    t_manipulate_arrow_stream_no_memory = np.load(f"v2_results_robi/bounding_box/{dim}/t_manipulate_arrow_stream_no_memory.npy")
+    t_manipulate_arrow_parquet = np.load(f"v2_results_robi/bounding_box/{dim}/t_manipulate_arrow_parquet.npy")
+    t_manipulate_hdf5_core = np.load(f"v2_results_robi/bounding_box/{dim}/t_manipulate_hdf5_core.npy")
+    t_manipulate_hdf5_sec2 = np.load(f"v2_results_robi/bounding_box/{dim}/t_manipulate_hdf5_sec2.npy")
+
 
     t_manipulate_hdf5_core_visit = hdf5_core_visit.t_manipulate
     t_manipulate_hdf5_sec2_visit = hdf5_sec2_visit.t_manipulate
@@ -91,7 +93,7 @@ for dim in dimensions:
     plt.ylabel("t (seconds)")
 
     # Show the plot
-    plt.savefig(f"results/v2/bounding_box/{dim}/load_{dim}.pdf")  # Save as PDF
+    plt.savefig(f"results/v2/bounding_box/{dim}/load_{dim}_visit.pdf")  # Save as PDF
 
     plt.clf()
 
@@ -114,7 +116,7 @@ for dim in dimensions:
     plt.ylabel("t (seconds)")
 
     # Show the plot
-    plt.savefig(f"results/v2/bounding_box/{dim}/access_{dim}.pdf")  # Save as PDF
+    plt.savefig(f"results/v2/bounding_box/{dim}/access_{dim}_visit.pdf")  # Save as PDF
 
     plt.clf()
 
@@ -137,7 +139,7 @@ for dim in dimensions:
     plt.ylabel("t (seconds)")
 
     # Show the plot
-    plt.savefig(f"results/v2/bounding_box/{dim}/manipulating_{dim}.pdf")  # Save as PDF
+    plt.savefig(f"results/v2/bounding_box/{dim}/manipulating_{dim}_visit.pdf")  # Save as PDF
 
     plt.clf()
 
