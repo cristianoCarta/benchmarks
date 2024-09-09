@@ -608,6 +608,71 @@ class ClockBoundingBoxConversion:
         self.t_manipulate = t_manipulate_hdf5
         self.t_access = t_access_hdf5
         return self
+    
+    def benchmark_hdf5_visit_items(self,
+                    path : str, 
+                    N : List[int],
+                    iterations : int,
+                    hdf5_driver : str = None
+                    ):
+            
+        t_load_hdf5 = []
+        t_access_hdf5 = []
+        t_manipulate_hdf5 = []
+
+        for item in N:
+
+            tmp_load_hdf5 = []
+            tmp_access_hdf5 = []
+            tmp_manipulate_hdf5 = []
+            
+            for j in tqdm(range(iterations)):
+                
+                ### LOADING ###
+                st_time_hdf5 = time.time()
+                with h5py.File(f'{path}_{item}_{hdf5_driver}.h5', 'r', driver=hdf5_driver) as f:
+                    en_time_hdf5 = time.time()
+                    tmp_load_hdf5.append(en_time_hdf5 - st_time_hdf5)
+                    
+                    ### MANIPULATION ###
+                    
+                    def get_all_access():
+                        def visit_func(name, obj):
+                            if isinstance(obj, h5py.Dataset) and ("type" in obj.attrs) and obj.attrs["type"] == "bbox":
+                                obj = obj[:]
+
+                        f.visititems(visit_func)
+
+                    def get_all_manipulation():
+                        manipulated_bboxes = []
+                        def visit_func(name, obj):
+                            if isinstance(obj, h5py.Dataset) and ("type" in obj.attrs) and obj.attrs["type"] == "bbox":
+                                obj = obj[:]
+                                manipulated_bbox = xycenterwh_to_xyminmax(obj)
+                                manipulated_bboxes.append(manipulated_bbox)
+                                     
+                        f.visititems(visit_func)
+                        return np.array(manipulated_bboxes)
+                    
+                    start_access = time.time()
+                    get_all_access()
+                    end_access = time.time()
+                    
+                    start_time_hdf5 = time.time()
+                    manipulated_output = get_all_manipulation()
+                    end_time_hdf5 = time.time()
+
+                    tmp_manipulate_hdf5.append(end_time_hdf5-start_time_hdf5)
+                    tmp_access_hdf5.append(end_access - start_access)
+
+            t_load_hdf5.append(sum(tmp_load_hdf5) / len(tmp_load_hdf5))
+            t_manipulate_hdf5.append(sum(tmp_manipulate_hdf5) / len(tmp_manipulate_hdf5))
+            t_access_hdf5.append(sum(tmp_access_hdf5) / len(tmp_access_hdf5))
+
+        self.t_load = t_load_hdf5
+        self.t_manipulate = t_manipulate_hdf5
+        self.t_access = t_access_hdf5
+        return self
         
     def benchmark_arrow(
             self,
