@@ -34,7 +34,6 @@ def draw_tree_schema(data, indent="", is_last=True):
 def make_offset(vector):
     return [vector[i] - vector[i - 1] for i in range(1, len(vector))]
 
-
 def group_objects(objects, cardinality_list):
     result = []
     index = 0
@@ -169,3 +168,33 @@ def add_struct_field(table : pa.Table,
         
         if indx == len(list(reversed(to_revert_paths))) - 1:
             return table.set_column(table.schema.get_field_index(list(reversed(feature_list_path))[indx]), list(reversed(feature_list_path))[indx], new_struct)
+        
+def get_sample_features(table : pa.Table,
+                        feature_list_paths: List[List[str]],
+                        feature_list_indexes : List[List[List[int]]] = None,
+                        sample_index : int = None
+                ):
+
+    sample = {}
+    if (not sample_index) and (feature_list_indexes):
+      for path,index in zip(feature_list_paths,feature_list_indexes):
+        obj = None
+        for i, feature_name in enumerate(path):
+            if i == 0:
+                obj = table.column(feature_name).chunk(0).take(index[i]) 
+            else:
+                obj = obj.values.field(feature_name).take(index[i])
+        sample[str(path[-1])] = obj.to_pylist()
+
+    elif (sample_index) and (not feature_list_indexes):
+      for path in feature_list_paths :
+        obj = None
+        for i, feature_name in enumerate(path):
+            if i == 0:
+                obj = table.column(feature_name).chunk(0).take([sample_index])   
+            else:
+                obj = obj.values.field(feature_name)
+        sample[str(path[-1])] = obj.to_pylist()
+    else:
+       raise TypeError("either list of indices or single index must be provided")
+    return sample
