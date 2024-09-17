@@ -14,6 +14,8 @@ from typing import *
 
 np.random.seed(0)
 
+TEST_paths = [["image_feature","class_feature","label"]]
+
 def draw_tree_schema(data, indent="", is_last=True):
     output = ""
     if isinstance(data, dict):
@@ -47,7 +49,7 @@ def group_objects(objects, cardinality_list):
             result.append(None)
     return result
 
-################# FUNCTION TO REGISTER IN PYARROW COMPUTE ################
+################# FUNCTION TO REGISTER IN PYARROW COMPUTE ##################
 def area(ctx,array):
     format = pc.list_element(array, 4)
     result = []
@@ -170,13 +172,14 @@ def add_struct_field(table : pa.Table,
             return table.set_column(table.schema.get_field_index(list(reversed(feature_list_path))[indx]), list(reversed(feature_list_path))[indx], new_struct)
         
 def get_sample_features(table : pa.Table,
+                        sample_index : int,
                         feature_list_paths: List[List[str]],
                         feature_list_indexes : List[List[List[int]]] = None,
-                        sample_index : int = None
                 ):
 
     sample = {}
-    if (not sample_index) and (feature_list_indexes):
+    if feature_list_indexes:
+      feature_list_indexes = [item.insert(0,[sample_index]) for item in feature_list_indexes]
       for path,index in zip(feature_list_paths,feature_list_indexes):
         obj = None
         for i, feature_name in enumerate(path):
@@ -186,7 +189,7 @@ def get_sample_features(table : pa.Table,
                 obj = obj.values.field(feature_name).take(index[i])
         sample[str(path[-1])] = obj.to_pylist()
 
-    elif (sample_index) and (not feature_list_indexes):
+    elif not feature_list_indexes:
       for path in feature_list_paths :
         obj = None
         for i, feature_name in enumerate(path):
@@ -198,3 +201,124 @@ def get_sample_features(table : pa.Table,
     else:
        raise TypeError("either list of indices or single index must be provided")
     return sample
+
+def partition_dataset(
+        table: pa.Table,
+        save_path : str,
+        max_batch_size : int = 300,
+        mode : str = "stream",
+        return_offsets : bool = False):
+    
+    batches = table.to_batches(max_batch_size)
+    offsets = np.cumsum([0] + [len(b) for b in batches], dtype=np.int64)
+    np.save(f"{save_path}/ds_offsets.npy",offsets)
+    if mode == "stream":
+        for i,batch in enumerate(batches):
+            with pa.OSFile(f"{save_path}/ds_{i+1}_of_{len(batches)}_stream.arrows", 'wb') as sink:  
+                with pa.ipc.new_stream(sink, batches[0].schema) as writer: 
+                    writer.write_batch(batch)  
+    elif mode == "file":
+        for i,batch in enumerate(batches):
+            with pa.OSFile(f"{save_path}/ds_{i+1}_of_{len(batches)}_file.arrow", 'wb') as sink:  
+                with pa.ipc.new_file(sink, batches[0].schema) as writer: 
+                    writer.write_batch(batch)
+    else:
+        raise NotImplementedError("mode not implemented")
+    
+    if return_offsets:
+        return offsets
+    
+def interpolation_search(arr: List[int], x: int) -> int:
+    """
+    Return the position i of a sorted array so that arr[i] <= x < arr[i+1]
+
+    Args:
+        arr (`List[int]`): non-empty sorted list of integers
+        x (`int`): query
+
+    Returns:
+        `int`: the position i so that arr[i] <= x < arr[i+1]
+
+    Raises:
+        `IndexError`: if the array is empty or if the query is outside the array values
+    """
+    i, j = 0, len(arr) - 1
+    while i < j and arr[i] <= x < arr[j]:
+        k = i + ((j - i) * (x - arr[i]) // (arr[j] - arr[i]))
+        if arr[k] <= x < arr[k + 1]:
+            return k
+        elif arr[k] < x:
+            i, j = k + 1, j
+        else:
+            i, j = i, k
+    raise IndexError(f"Invalid query '{x}' for size {arr[-1] if len(arr) else 'none'}.")
+
+def get_sample(root_path : str,
+               sample_index : int,
+               all_data_in_memory : bool = False,
+               memory_map : bool = False,
+               mode : str = "stream"
+               ):
+    
+        offsets = np.load(f"{root_path}/ds_offsets.npy")
+
+        #### ALL DATA IN MEMORY ####
+
+        if all_data_in_memory and mode=="stream" and memory_map:
+                with pa.memory_map(f"{root_path}/ds_{1}_of_{len(offsets)-1}_stream.arrows", 'rb') as source:
+                        table = pa.ipc.open_stream(source).read_all()
+                for i in list(range(2,len(offsets))):
+                        with pa.memory_map(f"{root_path}/ds_{i}_of_{len(offsets)-1}_stream.arrows", 'rb') as source:
+                                table = pa.concat_tables([table,pa.ipc.open_stream(source).read_all()])
+                table = table.combine_chunks()
+        
+        if all_data_in_memory and mode=="stream" and not memory_map:
+                with pa.OSFile(f"{root_path}/ds_{1}_of_{len(offsets)-1}_stream.arrows", 'rb') as source:
+                        table = pa.ipc.open_stream(source).read_all()
+                for i in list(range(2,len(offsets))):
+                        with pa.OSFile(f"{root_path}/ds_{i}_of_{len(offsets)-1}_stream.arrows", 'rb') as source:
+                                table = pa.concat_tables([table,pa.ipc.open_stream(source).read_all()])
+                table = table.combine_chunks()
+
+        if all_data_in_memory and mode=="file" and memory_map:
+                with pa.memory_map(f"{root_path}/ds_{1}_of_{len(offsets)-1}_file.arrow", 'rb') as source:
+                        table = pa.ipc.open_file(source).read_all()
+                for i in list(range(2,len(offsets))):
+                        with pa.memory_map(f"{root_path}/ds_{i}_of_{len(offsets)-1}_file.arrow", 'rb') as source:
+                                table = pa.concat_tables([table,pa.ipc.open_file(source).read_all()])
+                table = table.combine_chunks()
+
+        if all_data_in_memory and mode=="file" and not memory_map:
+                with pa.OSFile(f"{root_path}/ds_{1}_of_{len(offsets)-1}_file.arrow", 'rb') as source:
+                        table = pa.ipc.open_file(source).read_all()
+                for i in list(range(2,len(offsets))):
+                        with pa.OSFile(f"{root_path}/ds_{i}_of_{len(offsets)-1}_file.arrow", 'rb') as source:
+                                table = pa.concat_tables([table,pa.ipc.open_file(source).read_all()])
+                table = table.combine_chunks()
+
+        #### PARTITIONING ####
+
+        index_file_to_open = interpolation_search(offsets,sample_index)
+
+        if not all_data_in_memory and mode=="stream" and memory_map:
+                with pa.memory_map(f"{root_path}/ds_{index_file_to_open+1}_of_{len(offsets)-1}_stream.arrows", 'rb') as source:
+                        table = pa.ipc.open_stream(source).read_all()
+        
+        if not all_data_in_memory and mode=="stream" and not memory_map:
+                with pa.OSFile(f"{root_path}/ds_{index_file_to_open+1}_of_{len(offsets)-1}_stream.arrows", 'rb') as source:
+                        table = pa.ipc.open_stream(source).read_all()
+               
+        if not all_data_in_memory and mode=="file" and memory_map:
+                with pa.memory_map(f"{root_path}/ds_{index_file_to_open+1}_of_{len(offsets)-1}_file.arrow", 'rb') as source:
+                        table = pa.ipc.open_file(source).read_all()
+               
+
+        if not all_data_in_memory and mode=="file" and not memory_map:
+                with pa.OSFile(f"{root_path}/ds_{index_file_to_open+1}_of_{len(offsets)-1}_file.arrow", 'rb') as source:
+                        table = pa.ipc.open_file(source).read_all()
+
+        if not all_data_in_memory:
+                sample_index = sample_index-offsets[index_file_to_open]
+
+        
+        return get_sample_features(table,sample_index,TEST_paths)
