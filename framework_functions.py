@@ -13,7 +13,10 @@ from io import BytesIO
 from typing import *
 np.random.seed(0)
 
-TEST_paths = [["image_feature","class_feature","label"]]
+## TO ADD IN CLASS CONFIGURATION BY ATTRIBUTES ##
+TEST_paths = [["image_feature","boundingbox_feature","bbox"]]
+TEST_indices = [[[1],[0]]]
+##
 
 def draw_tree_schema(data, indent="", is_last=True):
     output = ""
@@ -80,7 +83,7 @@ pc.register_scalar_function(area, func_name, func_doc, in_types, out_type)
 def add_struct_to_feature(table : pa.Table,
               feature_list_path: List[str],
               feature_to_add_name : str,
-              feature_to_add_values : List[Dict]
+              feature_to_add_values : List[List[Dict]]
               ):
     
     """
@@ -113,7 +116,10 @@ def add_struct_to_feature(table : pa.Table,
     field_tmp = group_objects(field_tmp.to_pylist(), cardinality_list)
     new_field = []
     for i,j in zip(field_tmp,feature_to_add_values):
-        new_field.append(i+j)
+        if (not i) or (not j):
+            new_field.append(None)
+        else:
+            new_field.append(i+j)
     new_field = pa.array(new_field)
 
     for indx,level in enumerate(list(reversed(to_revert_paths))):
@@ -145,6 +151,8 @@ def add_feature(table : pa.Table,
               ):
     """
     This function permits to add a feature at the level specified by the last string contained in the attribute "feature_list_path"
+    Example usage:
+    add_feature(table,["image_feature","class_feature"],"boundingbox_feature",[[{"bbox":[0.5,0.5,0.5,0.5,0]},{"bbox":[0.6,0.6,0.6,0.6,1]}] for i in range(len(table))])
     """
     obj = None
     to_revert_paths = []
@@ -183,7 +191,24 @@ def add_feature(table : pa.Table,
         new_struct = pa.array(group_objects(new_struct_no_cardinality.to_pylist(), cardinality_list))
         
         if indx == len(list(reversed(to_revert_paths))) - 1:
-            return table.set_column(table.schema.get_field_index(list(reversed(feature_list_path))[indx]), list(reversed(feature_list_path))[indx], new_struct)        
+            return table.set_column(table.schema.get_field_index(list(reversed(feature_list_path))[indx]), list(reversed(feature_list_path))[indx], new_struct)
+
+def get_feature(table : pa.Table,
+                feature_list_path: List[str]
+              ):
+    """
+    This function permits to extract a feature at the location given by the feature_list_path argument
+    """
+    obj = None
+    
+
+    for indx, feature_name in enumerate(feature_list_path):
+        if indx == 0:
+            obj = table.column(feature_name).chunk(0)
+        else:
+            obj = obj.values.field(feature_name)
+
+    return obj                      
         
 def unary_operation_on_feature(table : pa.Table,
               feature_list_path: List[str],
@@ -242,7 +267,8 @@ def get_sample_features(table : pa.Table,
 
     sample = {}
     if feature_list_indexes:
-      feature_list_indexes = [item.insert(0,[sample_index]) for item in feature_list_indexes]
+      for item in feature_list_indexes:
+        item.insert(0,[sample_index])
       for path,index in zip(feature_list_paths,feature_list_indexes):
         obj = None
         for i, feature_name in enumerate(path):
@@ -384,4 +410,4 @@ def get_sample(root_path : str,
                 sample_index = sample_index-offsets[index_file_to_open]
 
         
-        return get_sample_features(table,sample_index,TEST_paths)
+        return get_sample_features(table,sample_index,TEST_paths,feature_list_indexes=TEST_indices)
