@@ -11,7 +11,6 @@ import os
 import numpy as np
 from io import BytesIO
 from typing import *
-
 np.random.seed(0)
 
 TEST_paths = [["image_feature","class_feature","label"]]
@@ -78,12 +77,22 @@ pc.register_scalar_function(area, func_name, func_doc, in_types, out_type)
 """
 #############################################################################
 
-def add_feature(table : pa.Table,
+def add_struct_to_feature(table : pa.Table,
               feature_list_path: List[str],
               feature_to_add_name : str,
               feature_to_add_values : List[Dict]
               ):
     
+    """
+    This function adds a list of structs for every sample of the dataset. 
+    Example: in a lenght 3 dataset, i can add a couple of classes for every sample
+    passing a list of list of dictionaries, like this:
+        [[{"label":0},{"label":1}],[{"label":1},{"label":2}],[{"label":3},{"label":4}]]
+
+    In other words, this function adds cardinality to an existing feature of the dataset by adding one
+    or more structs to it.
+    """
+
     obj = None
     to_revert_paths = []
 
@@ -102,7 +111,10 @@ def add_feature(table : pa.Table,
     field_tmp = obj.values
     cardinality_list = make_offset(obj.offsets.to_pylist())
     field_tmp = group_objects(field_tmp.to_pylist(), cardinality_list)
-    new_field = pa.array([item + feature_to_add_values for item in field_tmp])
+    new_field = []
+    for i,j in zip(field_tmp,feature_to_add_values):
+        new_field.append(i+j)
+    new_field = pa.array(new_field)
 
     for indx,level in enumerate(list(reversed(to_revert_paths))):
         if indx!=0:
@@ -125,13 +137,64 @@ def add_feature(table : pa.Table,
         
         if indx == len(list(reversed(to_revert_paths))) - 1:
             return table.set_column(table.schema.get_field_index(list(reversed(feature_list_path))[indx]), list(reversed(feature_list_path))[indx], new_struct)
+
+def add_feature(table : pa.Table,
+              feature_list_path: List[str],
+              new_feature_name : str,
+              new_feature : List[List[Dict]],
+              ):
+    """
+    This function permits to add a feature at the level specified by the last string contained in the attribute "feature_list_path"
+    """
+    obj = None
+    to_revert_paths = []
+
+    for indx, feature_name in enumerate(feature_list_path):
+        if indx == 0:
+            obj = table.column(feature_name).chunk(0)
+        else:
+            obj = obj.values.field(feature_name)
         
-def add_struct_field(table : pa.Table,
+        to_revert_paths.append(obj)
+
+        #if indx == len(feature_list_path) - 1:
+        #    obj = obj.values.field(feature_to_manipulate)
+
+    new_field = pa.array(new_feature)
+
+    new_struct = None
+
+    for indx,level in enumerate(list(reversed(to_revert_paths))):
+        if indx!=0:
+            new_field = new_struct
+            new_feature_name = list(reversed(feature_list_path))[indx - 1]
+        level_fields_values = [new_field]
+        level_fields_names = [new_feature_name]
+        
+        for x in list(level.values.type):
+            if not x.name == new_feature_name:
+                level_fields_names.append(x.name)
+                level_fields_values.append(level.values.field(x.name))    
+        new_struct_no_cardinality = pa.StructArray.from_arrays(
+            level_fields_values,  
+            names=level_fields_names
+        )
+        cardinality_list = make_offset(level.offsets.to_pylist())
+        new_struct = pa.array(group_objects(new_struct_no_cardinality.to_pylist(), cardinality_list))
+        
+        if indx == len(list(reversed(to_revert_paths))) - 1:
+            return table.set_column(table.schema.get_field_index(list(reversed(feature_list_path))[indx]), list(reversed(feature_list_path))[indx], new_struct)        
+        
+def unary_operation_on_feature(table : pa.Table,
               feature_list_path: List[str],
               feature_to_manipulate: str,
               new_feature_name : str,
               function_name :str):
-    
+    """
+    This function performs a unary operation on the specified feature and creates another feature at the same level of the specified feature
+    Example: computes bounding boxes area and creates a new feature inside every struct of the list of structs under
+    the "boundingbox_feature" name
+    """
     obj = None
     to_revert_paths = []
 
