@@ -1,14 +1,7 @@
-knn = ThresholdedKNN(threshold=5, max_k=100)
-
-o = knn(ds2,ds1,"emb_column","emb_column","class_column","class_column")
-l = [item for item in o if item]
-for item in l:
-    print(item)
-    
 import numpy as np
 import faiss
 
-class ThresholdedKNN(Action):
+class ThresholdedKNN():
 
     def __init__(self,
                  backend : str = "faiss",
@@ -16,7 +9,6 @@ class ThresholdedKNN(Action):
                  distance_type : str = "euclid",
                  max_k : int = 5
                  ) -> None:
-        super().__init__()
         self.backend = backend
         self.threshold = threshold
         self.distance_type = distance_type
@@ -25,29 +17,14 @@ class ThresholdedKNN(Action):
 
 
     def __call__(self,
-                 dataset1 : Dataset,
-                 dataset2 : Dataset,
-                 emb1_column_name : str,
+                 dataset1,
+                 dataset2,
+                 emb1_column_name : str,  ### Sono i path da specificare a livello di configurazione della classe dataset
                  emb2_column_name : str,
                  classes1_column_name : str,
                  classes2_column_name : str
-                 ) -> Dataset:
+                 ):
         
-        #emb1_feature = dataset1.get_feature(emb1_column_name)
-        #emb2_feature = dataset2.get_feature(emb2_column_name)
-
-        #d1_classes_feature = dataset1.get_feature(classes1_column_name)
-        #d2_classes_feature = dataset2.get_feature(classes2_column_name)
-
-        #emb1 = emb1_feature.data
-        #emb2 = emb2_feature.data
-        #
-        #d1_classes = d1_classes_feature.data
-        #d2_classes = d2_classes_feature.data
-#
-        #d1_classes_label = d1_classes_feature.class_labels  
-        #d2_classes_label = d2_classes_feature.class_labels
-
         emb1 = dataset1[emb1_column_name,"vector"]
         emb2 = dataset2[emb1_column_name,"vector"]
 
@@ -88,7 +65,7 @@ class ThresholdedKNN(Action):
                                   all_embeddings, 
                                   threshold, 
                                   k_neigh,
-                                  d1_classes : List,
+                                  d1_classes,
                                 ):
         
         query_vector = np.array(query_vector).astype('float32').reshape(1, -1)
@@ -111,3 +88,12 @@ class ThresholdedKNN(Action):
                 neighbors_classes.append(d1_classes[idx])
 
         return neighbors, neighbors_classes
+    
+
+knn = ThresholdedKNN(threshold=5, max_k=100)
+
+o = knn(ds2,ds1,"emb_column","emb_column","class_column","class_column")
+l = [item for item in o if item]
+for item in l:
+    print(item)
+    

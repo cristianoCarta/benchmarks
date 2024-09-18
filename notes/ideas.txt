@@ -1,18 +1,3 @@
-##################                 DONE            ########################################
-
-
-
-##################                 UNDONE          ########################################
-
-- f5 : nuovo benchmark con numero di bounding boxes per example estratto casualmente ( e per immagini)
-- Cambiare la decodifica delle immagini passando per PIL e torchvision.transform
-- Caso d'uso per benchmark: usare un dataloader di pytorch
-
 - Produrre documentazione, slides e risultati organizzati dei benchmark (da presentare)
-- Capire il framework "front-end" da interfacciare con il backend scelto (gestione delle feature e motore di inferenza (caso d'uso K-NN))
+- Gestire il knn quando trova due classi con la stessa confidence (in generale rivedere altre possibili strategie per l'assegnazione della nuova classe)
 
-
-
-NB : nei benchmark row-wise (pyarrow) si è fissato l'indice di riga delle immagini, nota bene, potrebbero essere più di un'immagine
-NB : gestione dei None per pyarrow
-NB : per le BOUNDING BOX: mettere direttamente il formato (YOLO = 0 ad esempio) come quinto elemento della bouding box? Aumenterebbe l'efficienza sia di HDF5 che di Pyarrow
