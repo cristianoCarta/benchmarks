@@ -1,3 +1,6 @@
 - Produrre documentazione, slides e risultati organizzati dei benchmark (da presentare)
 - Gestire il knn quando trova due classi con la stessa confidence (in generale rivedere altre possibili strategie per l'assegnazione della nuova classe)
+- Il knn avviene con entrambe le tabelle in pancia: gestire questa cosa?
+- IMPORTANTE : capire come aggiungere righe ad una tabella!
+- salvare confidence
 
