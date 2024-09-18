@@ -88,7 +88,7 @@ def add_struct_to_feature(table : pa.Table,
     
     """
     This function adds a list of structs for every sample of the dataset. 
-    Example: in a lenght 3 dataset, i can add a couple of classes for every sample
+    Example: in a lenght 3 dataset, I can add a couple of classes for every sample
     passing a list of list of dictionaries, like this:
         [[{"label":0},{"label":1}],[{"label":1},{"label":2}],[{"label":3},{"label":4}]]
 
@@ -116,8 +116,11 @@ def add_struct_to_feature(table : pa.Table,
     field_tmp = group_objects(field_tmp.to_pylist(), cardinality_list)
     new_field = []
     for i,j in zip(field_tmp,feature_to_add_values):
-        if (not i) or (not j):
+        if (not i) and (not j):
+            print(i)
             new_field.append(None)
+        elif not i:
+            new_field.append(j)
         else:
             new_field.append(i+j)
     new_field = pa.array(new_field)
@@ -152,7 +155,11 @@ def add_feature(table : pa.Table,
     """
     This function permits to add a feature at the level specified by the last string contained in the attribute "feature_list_path"
     Example usage:
-    add_feature(table,["image_feature","class_feature"],"boundingbox_feature",[[{"bbox":[0.5,0.5,0.5,0.5,0]},{"bbox":[0.6,0.6,0.6,0.6,1]}] for i in range(len(table))])
+    array_to_add = [[{"bbox":[0.5,0.5,0.5,0.5,0]},{"bbox":[0.6,0.6,0.6,0.6,1]}] for i in range(len(table))]
+    add_feature(table,["image_feature","class_feature"],"boundingbox_feature", array_to_add)
+
+    NB: The current state of this function REQUIRES the array_to_add to match the cardinality of the level to which is added. Example: for adding a label to every bounding box i need a len 50 array of labels, since bounding_box_feature LEN must be 50 (5 bouding boxes for every sample)
+    NB: There is not a criteria in the adding of the desired feature, yet: this action is simpy a flatten append of the array_to_add at the given level of the sample
     """
     obj = None
     to_revert_paths = []
