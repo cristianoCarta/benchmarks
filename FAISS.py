@@ -117,7 +117,7 @@ def knn(root_path_animal : str,
 
 
             classe_dedotta , confidence = compute_confidence(new_candidate_classes,dv,k)
-            #moda = most_frequent(new_candidate_classes)
+            moda = most_frequent(new_candidate_classes)
             #count = 0
             #for i in new_candidate_classes:
             #    if i==moda:
