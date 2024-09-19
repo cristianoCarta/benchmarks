@@ -13,8 +13,30 @@ import numpy as np
 from io import BytesIO
 from typing import *
 import pickle
-from collections import Counter
+from collections import defaultdict
 import framework_functions as ff
+
+def compute_confidence(new_candidate_classes: List,
+                       dv : List,
+                       k : int):
+    confidence = 0
+    choosen_class = None
+
+    grouped = defaultdict(list)
+    for i, d in zip(new_candidate_classes, dv):
+        grouped[i].append(d)
+
+    grouped_dict = dict(grouped)
+
+    for cls, distncs in grouped_dict.items():
+        new_confidence = new_candidate_classes.count(cls) / (k + (sum(distncs)/new_candidate_classes.count(cls)))
+        if new_confidence > confidence:
+              confidence = new_confidence
+              choosen_class = cls
+    
+    return choosen_class, confidence
+
+
 
 def knn(root_path_animal : str,
         root_path_species : str,
@@ -83,28 +105,32 @@ def knn(root_path_animal : str,
     for iv,dv in zip(I,D):
         iv = np.array(iv)
         dv = np.array(dv)
+        #iv = [iv[i] for i in range(len(dv)) if dv[i]<thr]
+        #dv = [dv[i] for i in range(len(dv)) if dv[i]<thr]
         iv = [iv[i] if dv[i]<thr else None for i in range(len(dv))]
         dv = [dv[i] if dv[i]<thr else None for i in range(len(dv))]
-        I_t.append(iv)
-        D_t.append(dv)
+        #I_t.append(iv)
+        #D_t.append(dv)
 
-        found_number_of_neighbours = len([x for x in iv if x is not None])
         new_candidate_classes = [class_animals[item] for item in iv if item]
         if new_candidate_classes:
-            moda = most_frequent(new_candidate_classes)
-            count = 0
-            for i in new_candidate_classes:
-                if i==moda:
-                    count = count+1
+
+
+            classe_dedotta , confidence = compute_confidence(new_candidate_classes,dv,k)
+            #moda = most_frequent(new_candidate_classes)
+            #count = 0
+            #for i in new_candidate_classes:
+            #    if i==moda:
+            #        count = count+1
         
             sample = {
                 "image_feature":[{
                     "image" : image_species[counter],
                     "class_feature":[
                         {
-                            "label" : moda,
+                            "label" : classe_dedotta,
                             "dataset" : "dataset_2_species",
-                            #"confidence" : count/found_number_of_neighbours
+                            "confidence" : confidence*100
                         }
                     ],
                     "embedding_feature":[
@@ -120,10 +146,11 @@ def knn(root_path_animal : str,
     new_table = pa.Table.from_pylist(output)
     ff.partition_dataset(new_table,root_path_to_merge)
 
-    np.save(r"C:\Users\Cristiano Lavoro\Desktop\benchmarks\knn_outputs\resnet\to_merge\I.npy",I_t)
-    np.save(r"C:\Users\Cristiano Lavoro\Desktop\benchmarks\knn_outputs\resnet\to_merge\D.npy",D_t)
+    #np.save(r"C:\Users\Cristiano Lavoro\Desktop\benchmarks\knn_outputs\resnet\to_merge\I.npy",I_t)
+    #np.save(r"C:\Users\Cristiano Lavoro\Desktop\benchmarks\knn_outputs\resnet\to_merge\D.npy",D_t)
 
-    return pa.concat_tables([table,new_table])
+    return new_table
+    #return pa.concat_tables([table,new_table])
 
 root_path_animal = "../benchmarks/knn_outputs/resnet/all_animals"
 root_path_species = "../benchmarks/knn_outputs/resnet/species"
@@ -136,5 +163,9 @@ merged_table = knn(root_path_animal,
         ["image_feature","embedding_feature","vector"],
         ["image_feature","class_feature","label"],
         6,
-        15)
+        0.4)
+len(merged_table)
+merged_table.column("image_feature").chunk(0).values.field("image")
+merged_table.column("image_feature").chunk(0).values.field("class_feature").values.field("label")
+debug = [0,0,0,0,0]
 
