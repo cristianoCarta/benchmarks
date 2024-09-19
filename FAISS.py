@@ -59,6 +59,9 @@ def knn(root_path_animal : str,
     index.add(X) 
     D, I = index.search(xq, k)
 
+    print(I)
+    print(D)
+
     output = []
     counter = 0
 
@@ -100,5 +103,21 @@ def knn(root_path_animal : str,
     new_table = pa.Table.from_pylist(output)
     ff.partition_dataset(new_table,root_path_to_merge)
 
+    np.save(r"C:\Users\Cristiano Lavoro\Desktop\benchmarks\knn_outputs\to_merge\N.npy",I)
+    np.save(r"C:\Users\Cristiano Lavoro\Desktop\benchmarks\knn_outputs\to_merge\D.npy",D)
+
     return pa.concat_tables([table,new_table])
+
+root_path_animal = "../benchmarks/knn_outputs/resnet/all_animals"
+root_path_species = "../benchmarks/knn_outputs/resnet/species"
+root_path_to_merge ="../benchmarks/knn_outputs/resnet/to_merge"
+
+merged_table = knn(root_path_animal,
+        root_path_species,
+        root_path_to_merge,
+        ["image_feature","embedding_feature","vector"],
+        ["image_feature","embedding_feature","vector"],
+        ["image_feature","class_feature","label"],
+        6,
+        35)
 
